@@ -38,7 +38,7 @@ def rank_key(c: dict) -> tuple:
 
 def main() -> int:
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text(encoding="utf-8"))
-    out = ROOT / "data" / date.today().isoformat()
+    out = ROOT / "data" / data.today_kst().isoformat()
     out.mkdir(parents=True, exist_ok=True)
     failures = {}
 
@@ -140,7 +140,7 @@ def main() -> int:
     plans = [{"ticker": c["ticker"], "name": c["name"], "verdict": c["risk"]["verdict"], "shares": c["risk"]["shares"], **c["plan"]} for c in candidates]
     (out / "plans.json").write_text(json.dumps(plans, ensure_ascii=False, indent=2), encoding="utf-8")
     summary = {
-        "date": date.today().isoformat(), "market": mkt, "risk_rules": rcfg,
+        "date": data.today_kst().isoformat(), "market": mkt, "risk_rules": rcfg,
         "picks": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"]} for c in picks],
         "other_candidates": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"]} for c in candidates if c not in picks],
         "backtest_by_setup": pooled, "universe": snaps, "failures": failures,

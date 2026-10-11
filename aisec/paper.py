@@ -104,7 +104,7 @@ def main(argv: list[str]) -> int:
         for pos in ledger:
             if pos["status"] not in ("대기", "보유"):
                 continue
-            days = (date.today() - date.fromisoformat(pos["approved_on"])).days + 10
+            days = (data.today_kst() - date.fromisoformat(pos["approved_on"])).days + 10
             try:
                 settle(pos, data.ohlcv(pos["ticker"], days, min_rows=1), max_hold)
             except data.DataUnavailable as e:

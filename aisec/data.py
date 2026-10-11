@@ -5,17 +5,27 @@ from datetime import date, timedelta
 import pandas as pd
 
 
+def today_kst() -> date:
+    """서버 시계(UTC)가 아니라 한국 날짜."""
+    from datetime import datetime, timezone
+    return datetime.now(timezone(timedelta(hours=9))).date()
+
+
 class DataUnavailable(RuntimeError):
     pass
 
 
 def _stock():
     from pykrx import stock  # import 시 로그인 메시지가 출력되므로 지연 로딩
+    from pykrx.website.naver.core import NaverWebIo
+
+    # pykrx 는 네이버 차트에 http:// 로 접속합니다. 클라우드 환경은 https 만 통과시키므로 바꿔 줍니다.
+    NaverWebIo.url = property(lambda self: "https://fchart.stock.naver.com/sise.nhn")
     return stock
 
 
 def ohlcv(ticker: str, lookback_days: int, min_rows: int = 130) -> pd.DataFrame:
-    end = date.today()
+    end = today_kst()
     start = end - timedelta(days=lookback_days)
     try:
         df = _stock().get_market_ohlcv(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), ticker)
@@ -28,7 +38,7 @@ def ohlcv(ticker: str, lookback_days: int, min_rows: int = 130) -> pd.DataFrame:
 
 def kospi(lookback_days: int = 200) -> pd.DataFrame:
     """코스피 지수 일봉 (KRX)."""
-    end = date.today()
+    end = today_kst()
     start = end - timedelta(days=lookback_days)
     try:
         df = _stock().get_index_ohlcv(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), "1001")
@@ -43,7 +53,7 @@ def foreign_net_5d(ticker: str) -> float | None:
     """최근 5영업일 외국인 순매수 금액(원). 로그인 정보가 없으면 None."""
     if not (os.getenv("KRX_ID") and os.getenv("KRX_PW")):
         return None
-    end = date.today()
+    end = today_kst()
     start = end - timedelta(days=12)
     try:
         df = _stock().get_market_trading_value_by_date(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), ticker)
@@ -56,7 +66,7 @@ def fundamental(ticker: str) -> dict | None:
     """PER·PBR·배당수익률 (KRX 로그인 필요). 실패하면 None."""
     if not (os.getenv("KRX_ID") and os.getenv("KRX_PW")):
         return None
-    end = date.today()
+    end = today_kst()
     start = end - timedelta(days=10)
     try:
         df = _stock().get_market_fundamental(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), ticker)

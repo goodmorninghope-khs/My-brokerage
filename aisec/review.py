@@ -20,7 +20,7 @@ def main(max_hold: int = 20) -> int:
         day = plans_file.parent.name
         for p in json.loads(plans_file.read_text(encoding="utf-8")):
             try:
-                df = data.ohlcv(p["ticker"], (date.today() - date.fromisoformat(day)).days + 10, min_rows=1)
+                df = data.ohlcv(p["ticker"], (data.today_kst() - date.fromisoformat(day)).days + 10, min_rows=1)
             except data.DataUnavailable as e:
                 print(f"건너뜀: {e}", file=sys.stderr)
                 continue
