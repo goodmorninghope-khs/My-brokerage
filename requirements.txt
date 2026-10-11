@@ -1,0 +1,4 @@
+pykrx>=1.2.9
+pandas>=2.0
+pyyaml>=6.0
+pytest>=8.0
