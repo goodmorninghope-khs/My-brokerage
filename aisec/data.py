@@ -14,15 +14,28 @@ def _stock():
     return stock
 
 
-def ohlcv(ticker: str, lookback_days: int) -> pd.DataFrame:
+def ohlcv(ticker: str, lookback_days: int, min_rows: int = 130) -> pd.DataFrame:
     end = date.today()
     start = end - timedelta(days=lookback_days)
     try:
         df = _stock().get_market_ohlcv(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), ticker)
     except Exception as e:  # 네트워크 차단·사이트 변경 등
         raise DataUnavailable(f"{ticker} 주가를 받지 못했습니다: {e}") from e
-    if df is None or len(df) < 61:
+    if df is None or len(df) < min_rows:
         raise DataUnavailable(f"{ticker} 주가 데이터가 비었거나 너무 짧습니다 ({0 if df is None else len(df)}일).")
+    return df
+
+
+def kospi(lookback_days: int = 200) -> pd.DataFrame:
+    """코스피 지수 일봉 (KRX)."""
+    end = date.today()
+    start = end - timedelta(days=lookback_days)
+    try:
+        df = _stock().get_index_ohlcv(start.strftime("%Y%m%d"), end.strftime("%Y%m%d"), "1001")
+    except Exception as e:
+        raise DataUnavailable(f"코스피 지수를 받지 못했습니다: {e}") from e
+    if df is None or len(df) < 61:
+        raise DataUnavailable("코스피 지수 데이터가 비었거나 너무 짧습니다.")
     return df
 
 

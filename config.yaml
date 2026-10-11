@@ -17,22 +17,29 @@ market_cap_top:
   market: ALL               # KOSPI / KOSDAQ / ALL
   exclude_preferred: true   # 삼성전자우 같은 우선주 제외
 
-# 얼마나 과거까지 볼지 (영업일 기준이 아니라 달력 기준 일수)
-lookback_days: 400
+# 얼마나 과거까지 받을지 (달력 기준 일수). 백테스트에 3년치를 씁니다.
+lookback_days: 1100
 
-# 아침 필터: 아래 조건을 '점수'로 매겨서 상위 N개만 6부서 회의에 올립니다.
+# 스크리닝부: 오늘 셋업(돌파·눌림목·모멘텀·추세지속·반전)이 성립한 종목 중
+# 리스크 통과 → 백테스트 성적 순으로 상위 N개만 부서 회의에 올립니다.
 screen:
   top_n: 3
-  rules:
-    above_ma60: 1        # 종가가 60일 이동평균 위 (추세 살아있음)
-    ma20_over_ma60: 1    # 20일선이 60일선 위 (정배열)
-    rsi_not_overheated: 1  # RSI(14) 70 미만 (과열 아님)
-    volume_surge: 1      # 거래량이 20일 평균의 1.5배 이상
-    near_52w_high: 1     # 52주 신고가 대비 -10% 이내
-    foreign_net_buy: 1   # 최근 5일 외국인 순매수 (KRX 로그인 필요)
 
-# 리스크 원칙 — 리스크관리부가 이 숫자를 기준으로 판단합니다.
+# 운용부: 목표가 = 진입가 + 손익비 × (진입가 - 손절가)
+plan:
+  target_rr: 2.0
+  max_hold_days: 20      # 이 기간 안에 목표·손절 어느 쪽도 안 닿으면 정리
+
+# 리스크관리부: 5가지 기준. 하나라도 걸리면 '차단 → 매매 보류'.
 risk:
-  max_position_pct: 10   # 한 종목에 전체 자산의 10% 초과 금지
-  stop_loss_pct: 7       # 매수가 대비 -7%면 손절 검토
-  max_daily_new_buys: 1  # 하루 신규 매수 최대 1건
+  capital: 10000000          # ← 본인 투자금(원)으로 고치세요. 지금 값은 예시입니다.
+  risk_per_trade_pct: 1      # 한 번 손절로 잃어도 되는 돈 = 자산의 1%
+  max_position_pct: 10       # 01 투자비중: 한 종목 최대 10%
+  max_total_exposure_pct: 60 # 02 총노출: 주식 비중 최대 60% (나머지 현금)
+  min_rr: 2.0                # 03 손익비: 최소 1:2
+  stop_loss_pct: 7           # 04 최대손실: 손절폭 최대 -7%
+  max_atr_pct: 5             # 05 변동성: 하루 평균 변동폭(ATR) 5% 초과 종목은 차단
+  max_daily_new_buys: 1
+
+# 지금 들고 있는 종목 (총노출 계산용). 예: "005930": {shares: 10, avg_price: 70000}
+portfolio: {}
