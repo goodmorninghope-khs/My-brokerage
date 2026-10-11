@@ -18,13 +18,13 @@
 | 반대편부 | `redteam-desk.md` | 사면 안 되는 이유를 일부러 찾음 |
 | 투자위원장 | `.claude/skills/morning-brief` | 회의 진행, 결재 문서 작성 |
 
-규칙은 `config.yaml` 한 파일에 있습니다. 관심종목, 필터 조건, 손절 % 를 여기서 고칩니다.
+규칙은 `config.yaml` 한 파일에 있습니다. 관심종목, 시총 상위 몇 위까지 볼지, 필터 조건, 손절 % 를 여기서 고칩니다.
 
 ## 처음 한 번만 할 일
 
 1. **네트워크 열기** (Claude Code 클라우드 환경 설정 → Network access → Allowed domains)
    - `fchart.stock.naver.com`: 일봉 주가 (필수)
-   - `data.krx.co.kr`: 수급·PER (선택)
+   - `data.krx.co.kr`: 시가총액 상위 20 순위, 수급, PER (없으면 관심종목 6개만 분석)
 2. **KRX 무료 회원가입** (data.krx.co.kr), 환경 변수 `KRX_ID`, `KRX_PW` 등록
    (클라우드 환경 설정의 Environment variables). 없으면 수급·재무 부서는 "자료 없음"으로 보고합니다.
 3. 동작 확인: `python -m pytest -q`, 그다음 `python -m aisec.cli`

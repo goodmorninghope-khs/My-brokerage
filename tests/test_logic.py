@@ -30,3 +30,14 @@ def test_rank_orders_by_score():
     picks = screen.rank({"UP": up, "DOWN": down}, rules, top_n=1)
     assert picks[0]["ticker"] == "UP"
     assert "foreign_net_buy" not in picks[0]["passed"]  # 수급 데이터 없으면 통과로 치지 않음
+
+
+def test_build_universe_merges_watchlist_and_top():
+    from aisec.cli import build_universe
+    from aisec.data import is_preferred
+
+    u = build_universe({"005930": "삼성전자", "000990": "DB하이텍"}, {"005930": "삼성전자", "373220": "LG에너지솔루션"})
+    assert list(u) == ["005930", "000990", "373220"]
+    assert u["005930"] == {"name": "삼성전자", "source": "관심종목", "mcap_rank": 1}
+    assert u["373220"]["source"] == "시총상위"
+    assert is_preferred("005935") and not is_preferred("005930")

@@ -12,6 +12,17 @@ import yaml
 
 from . import data, indicators, screen
 
+
+def build_universe(watchlist: dict, top: dict) -> dict[str, dict]:
+    """관심종목을 먼저, 시총 상위를 뒤에 합칩니다. 겹치면 관심종목으로 표시."""
+    universe = {t: {"name": n, "source": "관심종목"} for t, n in watchlist.items()}
+    for rank, (t, n) in enumerate(top.items(), 1):
+        if t in universe:
+            universe[t]["mcap_rank"] = rank
+        else:
+            universe[t] = {"name": n, "source": "시총상위", "mcap_rank": rank}
+    return universe
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -21,14 +32,23 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     snaps, failures, frames = {}, {}, {}
-    for ticker, name in cfg["watchlist"].items():
+    top_cfg = cfg.get("market_cap_top") or {}
+    top = {}
+    if top_cfg.get("count"):
+        try:
+            top = data.market_cap_top(top_cfg["count"], top_cfg.get("market", "ALL"), top_cfg.get("exclude_preferred", True))
+        except data.DataUnavailable as e:
+            failures["market_cap_top"] = f"{e} → 관심종목만 분석합니다."
+    universe = build_universe(cfg["watchlist"], top)
+
+    for ticker, meta in universe.items():
         try:
             df = data.ohlcv(ticker, cfg["lookback_days"])
         except data.DataUnavailable as e:
             failures[ticker] = str(e)
             continue
         snap = indicators.snapshot(df)
-        snap["name"] = name
+        snap.update(meta)
         snap["foreign_net_5d"] = data.foreign_net_5d(ticker)
         snaps[ticker], frames[ticker] = snap, df
 
