@@ -144,3 +144,12 @@ def test_holdings_stop_breach_sells_all_and_trend_broken_trimmed_first():
     res = review(pf, {"A": 99000, "B": 99000}, {**RISK, "capital": 1_500_000, "max_total_exposure_pct": 70},
                  trends={"A": False, "B": True})
     assert res["rows"][1]["sell"] > 0 and res["rows"][0]["sell"] == 0   # 추세 이탈 B 먼저
+
+
+def test_holdings_position_limit_is_soft_warning_only():
+    from aisec.holdings import review
+    pf = {"A": {"shares": 40, "avg_price": 124100}}
+    res = review(pf, {"A": 120600}, {**RISK, "max_position_pct": 20, "max_total_exposure_pct": 70})
+    r = res["rows"][0]
+    assert r["sell"] == 0 and r["weight_pct"] > 20
+    assert any("유연" in why for why in r["reasons"])

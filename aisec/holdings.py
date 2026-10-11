@@ -7,6 +7,7 @@
 2. 주식 비중이 총노출 한도를 넘으면 → 초과분만큼 축소 제안
    축소 순서: 추세 이탈(20일선 < 60일선이고 종가 < 60일선) 종목 먼저, 그다음 손절선에 가까운 종목 먼저
 3. 나머지 → 보유 유지, 손절선·목표가 안내
+* 한 종목 비중 한도(max_position_pct)는 보유 종목에 '유연'하게: 넘으면 경고와 참고 수량만 보여 주고 강제 축소하지 않습니다.
 
 수동 실행 (데이터 연결 전, 앱 화면 가격으로):
     python -m aisec.holdings 052690=120600 066570=200500
@@ -57,6 +58,12 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
 
     for r in rows:
         r["after_shares"] = r["shares"] - r["sell"]
+        weight = r["after_shares"] * r["price"] / capital * 100
+        r["weight_pct"] = round(weight, 1)
+        if weight > risk["max_position_pct"] + risk.get("position_flex_pct", 0):
+            keep = math.floor(capital * risk["max_position_pct"] / 100 / r["price"])
+            r["reasons"].append(f"⚠ 한 종목 비중 {weight:.1f}% (한도 {risk['max_position_pct']}%, 유연 적용) — "
+                                f"한도에 맞추려면 {keep}주까지 줄여야 함. 참고만, 강제 아님")
         if r["after_shares"]:
             r["reasons"].append(f"남은 {r['after_shares']}주: 손절선 {r['stop']:,}원(현재가 대비 {r['to_stop_pct']}%), "
                                 f"목표가 {r['target']:,}원")
@@ -72,10 +79,10 @@ def render(res: dict, as_of: str) -> str:
     lines = [f"## 보유 종목 점검 ({as_of})", "",
              f"주식 비중 {res['before_pct']}% → 제안대로 하면 {res['after_pct']}% (원칙 {res['limit_pct']}%), "
              f"확보 현금 {res['cash_freed']:,}원", "",
-             "| 종목 | 보유 | 평균단가 | 현재가 | 손익 | 손절선 | 규칙 제안 |", "|---|---|---|---|---|---|---|"]
+             "| 종목 | 보유 | 평균단가 | 현재가 | 손익 | 손절선 | 규칙 제안 | 제안 후 비중 |", "|---|---|---|---|---|---|---|---|"]
     for r in res["rows"]:
         lines.append(f"| {r['name']} | {r['shares']}주 | {r['avg_price']:,} | {r['price']:,} | "
-                     f"{r['pnl']:+,}원 ({r['pnl_pct']:+}%) | {r['stop']:,} | **{r['action']}** |")
+                     f"{r['pnl']:+,}원 ({r['pnl_pct']:+}%) | {r['stop']:,} | **{r['action']}** | {r['weight_pct']}% |")
     lines.append("")
     for r in res["rows"]:
         lines.append(f"- {r['name']}: " + " / ".join(r["reasons"]))
