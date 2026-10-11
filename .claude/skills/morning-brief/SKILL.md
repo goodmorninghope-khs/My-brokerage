@@ -45,7 +45,14 @@ description: 나의 AI 증권사 아침 브리핑. 숫자(스크리닝·셋업·
    ```
    마지막 줄: "백테스트는 과거 성적일 뿐 미래 수익을 보장하지 않습니다. 최종 결정과 책임은 결재자에게 있습니다."
 
-5. **자가학습**: 매주 월요일에는 `python -m aisec.review` 도 실행해 `reports/review.md` 를 갱신하고,
+5. **모의투자 장부**
+   - 회의 전에 `python -m aisec.paper update` 로 지난 승인 건 체결·청산을 채점하고, reports/paper.md 요약 3줄을 결재 문서 맨 위에 붙입니다.
+   - 대표님이 "<종목> 승인"이라고 하면 `python -m aisec.paper approve <브리핑 날짜> <종목코드>` 로 가상 매수를 등록합니다.
+     리스크 '차단' 종목은 코드가 거부합니다. 실제 주문은 대표님이 신한 앱에서 직접 합니다(아직 자동 주문 없음).
+
+6. **작은 성공 체크**: MILESTONES.md 에서 오늘 새로 증거가 생긴 항목이 있으면 [x] 로 바꾸고 결재 문서 끝에 "오늘의 작은 성공"으로 적습니다.
+
+7. **자가학습**: 매주 월요일에는 `python -m aisec.review` 도 실행해 `reports/review.md` 를 갱신하고,
    어떤 셋업이 실제로 잘 맞았는지 요약 3줄을 결재 문서 끝에 붙입니다.
 
-6. 커밋: `git add reports data && git commit -m "brief: <날짜>"` 후 push.
+8. 커밋: `git add reports data paper MILESTONES.md && git commit -m "brief: <날짜>"` 후 push.

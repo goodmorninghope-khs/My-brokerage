@@ -123,7 +123,7 @@ def main() -> int:
         ]
         (out / f"dossier_{t}.md").write_text("\n".join(doc), encoding="utf-8")
 
-    plans = [{"ticker": c["ticker"], "name": c["name"], "verdict": c["risk"]["verdict"], **c["plan"]} for c in candidates]
+    plans = [{"ticker": c["ticker"], "name": c["name"], "verdict": c["risk"]["verdict"], "shares": c["risk"]["shares"], **c["plan"]} for c in candidates]
     (out / "plans.json").write_text(json.dumps(plans, ensure_ascii=False, indent=2), encoding="utf-8")
     summary = {
         "date": date.today().isoformat(), "market": mkt, "risk_rules": rcfg,

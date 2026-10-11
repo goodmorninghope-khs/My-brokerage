@@ -100,3 +100,28 @@ def test_build_universe_merges_watchlist_and_top():
 
 def test_market_shock_is_plain_bool():
     assert market.regime(_frame([2500] * 99 + [2400]))["shock"] is True
+
+
+def _pos(**kw):
+    return {"id": 1, "approved_on": "2024-01-01", "ticker": "X", "name": "X", "setup": "돌파",
+            "entry_zone": [99, 101], "stop": 95, "target": 110, "shares": 10, "status": "대기", **kw}
+
+
+def test_paper_fills_in_zone_and_hits_target():
+    from aisec.paper import settle
+    bars = _frame([100, 100, 105, 112], spread=0.0)     # 1/1 승인 → 1/2 시가 100 체결 → 1/4 112 목표
+    p = settle(_pos(), bars, 20)
+    assert p["status"] == "청산" and p["result"] == "목표" and p["fill_price"] == 100 and p["pnl"] > 0
+
+
+def test_paper_does_not_chase_gap_up():
+    from aisec.paper import settle
+    p = settle(_pos(), _frame([100, 104, 106], spread=0.0), 20)   # 다음 날 시가 104 > 진입 상단 101
+    assert p["status"] == "미체결"
+
+
+def test_paper_holding_shows_unrealized_pnl():
+    from aisec.paper import scorecard, settle
+    p = settle(_pos(), _frame([100, 100, 102], spread=0.0), 20)
+    assert p["status"] == "보유" and p["pnl"] == 20
+    assert "보유 1건" in scorecard([p])
