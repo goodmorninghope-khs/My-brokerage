@@ -2,7 +2,8 @@
 
 가정 (보수적으로):
 - 신호가 뜬 다음 날 시가에 진입. 다음 날 시가가 진입 구간을 벗어나도 그냥 진입(단순화).
-- 같은 날 손절가와 목표가를 둘 다 건드리면 손절로 칩니다.
+- 손절: 셋업 손절가와 -stop_loss_pct% 중 진입가에 가까운 쪽. 같은 날 손절·익절이 겹치면 손절로 칩니다.
+- 익절: take_profit 단계대로 나눠 팝니다 (예: +10%에 절반, +15%에 나머지).
 - max_hold 거래일이 지나면 종가에 정리.
 - 거래마다 자산의 risk_pct% 만 걸었다고 보고 자산 곡선을 계산(리스크관리부 규칙과 동일).
 - 수수료·세금 0.25%를 거래마다 뺍니다.
@@ -11,23 +12,42 @@ import pandas as pd
 
 from .setups import detect, features
 
+
+def targets_for(price: float, take_profit: list) -> list:
+    """[[수익률%, 비율], ...] → [[목표가, 비율], ...]"""
+    return [[round(price * (1 + pct / 100)), portion] for pct, portion in take_profit]
+
 COST_PCT = 0.25
 
 
-def simulate_exit(bars: pd.DataFrame, entry: float, stop: float, target: float, max_hold: int) -> dict:
-    """진입 이후 일봉(bars, 진입일 포함)에서 언제 어떻게 나가는지."""
+def simulate_exit(bars: pd.DataFrame, entry: float, stop: float, targets: list, max_hold: int) -> dict:
+    """진입 이후 일봉(bars, 진입일 포함)에서 언제 어떻게 나가는지.
+
+    targets = [[가격, 파는 비율], ...] — 예: [[11000, 0.5], [11500, 0.5]] (+10%에 절반, +15%에 나머지)
+    exit 는 나눠 판 가격들의 가중평균입니다.
+    """
+    pending = sorted([list(t) for t in targets])
+    remaining, proceeds, hits = 1.0, 0.0, 0
     for i, (day, b) in enumerate(bars.iterrows()):
-        if b["저가"] <= stop:
+        if b["저가"] <= stop:  # 같은 날 손절·익절이 겹치면 손절로 봅니다(보수적)
             px = min(stop, b["시가"]) if i > 0 else stop  # 갭하락이면 시가에 손절
-            return {"exit_date": day, "exit": px, "result": "손절"}
-        if b["고가"] >= target:
-            return {"exit_date": day, "exit": max(target, b["시가"]) if i > 0 else target, "result": "목표"}
+            proceeds += remaining * px
+            return {"exit_date": day, "exit": proceeds, "result": "손절" if not hits else f"{hits}차 익절 후 손절"}
+        while pending and b["고가"] >= pending[0][0]:
+            price, portion = pending.pop(0)
+            take = min(portion, remaining)
+            proceeds += take * (max(price, b["시가"]) if i > 0 else price)
+            remaining -= take
+            hits += 1
+        if remaining <= 1e-9:
+            return {"exit_date": day, "exit": proceeds, "result": "익절 완료"}
         if i + 1 >= max_hold:
-            return {"exit_date": day, "exit": b["종가"], "result": "기간만료"}
+            proceeds += remaining * b["종가"]
+            return {"exit_date": day, "exit": proceeds, "result": "기간만료" if not hits else f"{hits}차 익절 후 기간만료"}
     return {"exit_date": None, "exit": None, "result": "진행중"}
 
 
-def run(df: pd.DataFrame, target_rr: float, max_hold: int = 20) -> list[dict]:
+def run(df: pd.DataFrame, stop_loss_pct: float, take_profit: list, max_hold: int = 20) -> list[dict]:
     f = features(df)
     trades, busy_until = [], None
     for i in range(len(df) - 1):
@@ -36,11 +56,10 @@ def run(df: pd.DataFrame, target_rr: float, max_hold: int = 20) -> list[dict]:
             continue  # 한 종목에 한 번에 한 포지션
         for s in detect(f.iloc[i]):
             entry = float(df["시가"].iloc[i + 1])
-            stop = s["stop"]
+            stop = max(s["stop"], entry * (1 - stop_loss_pct / 100))  # 셋업 손절과 -N% 중 가까운 쪽
             if entry <= stop:
                 continue
-            target = entry + target_rr * (entry - stop)
-            out = simulate_exit(df.iloc[i + 1:], entry, stop, target, max_hold)
+            out = simulate_exit(df.iloc[i + 1:], entry, stop, targets_for(entry, take_profit), max_hold)
             if out["result"] == "진행중":
                 continue
             ret = (out["exit"] / entry - 1) * 100 - COST_PCT

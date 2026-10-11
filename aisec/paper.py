@@ -5,7 +5,7 @@
 
 체결 규칙 (원칙대로):
 - 승인 다음 거래일 시가가 진입 구간 안이면 그 값에 체결. 벗어나면 '미체결' — 쫓아가 사지 않습니다.
-- 체결 뒤에는 손절가·목표가·보유기간 규칙대로만 청산 (백테스트와 같은 함수).
+- 체결 뒤에는 손절가·단계별 익절가·보유기간 규칙대로만 청산 (백테스트와 같은 함수).
 """
 import json
 import sys
@@ -44,7 +44,7 @@ def approve(day: str, ticker: str, ledger: list[dict]) -> dict:
     if any(x["ticker"] == ticker and x["status"] in ("대기", "보유") for x in ledger):
         raise SystemExit(f"{p['name']}은(는) 이미 장부에 진행 중인 거래가 있습니다.")
     pos = {"id": len(ledger) + 1, "approved_on": day, "ticker": ticker, "name": p["name"], "setup": p["setup"],
-           "entry_zone": p["entry_zone"], "stop": p["stop"], "target": p["target"], "shares": p["shares"],
+           "entry_zone": p["entry_zone"], "stop": p["stop"], "targets": p["targets"], "shares": p["shares"],
            "status": "대기"}
     ledger.append(pos)
     return pos
@@ -64,7 +64,7 @@ def settle(pos: dict, bars: pd.DataFrame, max_hold: int) -> dict:
             return pos
         pos.update(status="보유", fill_price=first_open)
     held = after[after.index >= pos["fill_date"]]
-    out = simulate_exit(held, pos["fill_price"], pos["stop"], pos["target"], max_hold)
+    out = simulate_exit(held, pos["fill_price"], pos["stop"], pos["targets"], max_hold)
     if out["result"] == "진행중":
         last = float(held["종가"].iloc[-1])
         pos.update(last_close=last, pnl=round((last - pos["fill_price"]) * pos["shares"]))
@@ -80,15 +80,15 @@ def scorecard(ledger: list[dict]) -> str:
     holding = [p for p in ledger if p["status"] == "보유"]
     wins = [p for p in closed if p["pnl"] > 0]
     lines = ["# 모의투자 성적표", "",
-             f"- 청산 {len(closed)}건 (목표 {sum(p['result'] == '목표' for p in closed)} · 손절 {sum(p['result'] == '손절' for p in closed)}"
-             f" · 기간만료 {sum(p['result'] == '기간만료' for p in closed)}), 승률 {len(wins) / len(closed) * 100:.0f}%" if closed else "- 청산된 거래 없음",
+             f"- 청산 {len(closed)}건 (익절 완료 {sum(p['result'] == '익절 완료' for p in closed)} · 손절 {sum('손절' in p['result'] for p in closed)}"
+             f" · 기간만료 {sum('기간만료' in p['result'] for p in closed)}), 승률 {len(wins) / len(closed) * 100:.0f}%" if closed else "- 청산된 거래 없음",
              f"- 확정 손익 {sum(p['pnl'] for p in closed):+,}원 · 보유 {len(holding)}건 평가손익 {sum(p.get('pnl', 0) for p in holding):+,}원",
              f"- 미체결(쫓아 사지 않음) {sum(p['status'] == '미체결' for p in ledger)}건",
              f"- 20건까지 {max(0, 20 - len(closed))}건 남음 — 그 전의 승률은 우연일 수 있습니다.", "",
-             "| # | 승인일 | 종목 | 셋업 | 상태 | 체결가 | 손절 | 목표 | 결과 | 손익(원) |", "|---|---|---|---|---|---|---|---|---|---|"]
+             "| # | 승인일 | 종목 | 셋업 | 상태 | 체결가 | 손절 | 익절 | 결과 | 손익(원) |", "|---|---|---|---|---|---|---|---|---|---|"]
     for p in ledger:
         lines.append(f"| {p['id']} | {p['approved_on']} | {p['name']} | {p['setup']} | {p['status']} | "
-                     f"{p.get('fill_price', '-')} | {p['stop']} | {p['target']} | {p.get('result', '-')} | {p.get('pnl', '-')} |")
+                     f"{p.get('fill_price', '-')} | {p['stop']} | {' / '.join(str(t[0]) for t in p['targets'])} | {p.get('result', '-')} | {p.get('pnl', '-')} |")
     return "\n".join(lines)
 
 
@@ -97,7 +97,7 @@ def main(argv: list[str]) -> int:
     if argv[:1] == ["approve"] and len(argv) == 3:
         pos = approve(argv[1], argv[2], ledger)
         save(ledger)
-        print(f"가상 매수 등록: {pos['name']} {pos['shares']}주, 진입 구간 {pos['entry_zone']}, 손절 {pos['stop']}, 목표 {pos['target']}")
+        print(f"가상 매수 등록: {pos['name']} {pos['shares']}주, 진입 구간 {pos['entry_zone']}, 손절 {pos['stop']}, 익절 {pos['targets']}")
         return 0
     if argv[:1] == ["update"]:
         max_hold = yaml.safe_load((ROOT / "config.yaml").read_text(encoding="utf-8"))["plan"]["max_hold_days"]

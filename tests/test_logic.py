@@ -6,7 +6,7 @@ from aisec.cli import build_universe
 from aisec.data import is_preferred
 
 RISK = {"capital": 10_000_000, "risk_per_trade_pct": 1, "max_position_pct": 10, "max_total_exposure_pct": 60,
-        "min_rr": 2.0, "stop_loss_pct": 7, "max_atr_pct": 5}
+        "min_rr": 2.0, "stop_loss_pct": 5, "max_atr_pct": 5}
 
 
 def _frame(closes, volumes=None, spread=0.01):
@@ -41,27 +41,32 @@ def test_trend_setup_and_stop_below_price():
     assert all(s["stop"] < f.iloc[-1]["close"] for s in found)
 
 
-def test_plan_reward_to_risk():
-    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, target_rr=2.0)
-    assert p["target"] == 11000 and p["rr"] == 2.0 and p["stop_pct"] == -5.0
+TP = [[10, 0.5], [15, 0.5]]
+
+
+def test_plan_stop_capped_at_5pct_and_two_stage_targets():
+    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9000, "why": ""}, 5, TP)   # 셋업 손절 -10% → -5%로
+    assert p["stop"] == 9500 and p["targets"] == [[11000, 0.5], [11500, 0.5]] and p["rr"] == 2.0
+    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9700, "why": ""}, 5, TP)   # 셋업 손절이 더 가까우면 그쪽
+    assert p["stop"] == 9700 and p["rr"] == 3.33
 
 
 def test_risk_gate_sizes_by_one_percent_rule():
-    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, 2.0)
-    g = risk.gate(p, atr_pct=2, market={"shock": False}, risk=RISK, exposure=0)
-    # 1% = 10만원, 주당 손실 500원 → 200주지만 비중 10%(100만원) 한도에 걸려 100주
-    assert g["shares"] == 100 and g["verdict"].startswith("통과")
+    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, 5, TP)
+    g = risk.gate(p, atr_pct=2, market={"shock": False}, risk={**RISK, "max_position_pct": 20}, exposure=0)
+    # 1% = 10만원, 주당 손실 500원 → 200주 = 200만원 = 비중 20% 한도와 정확히 일치
+    assert g["shares"] == 200 and g["verdict"].startswith("통과")
 
 
-def test_risk_gate_blocks_on_market_shock_and_wide_stop():
-    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9000, "why": ""}, 2.0)   # 손절폭 -10%
-    g = risk.gate(p, atr_pct=2, market={"shock": True}, risk=RISK, exposure=0)
+def test_risk_gate_blocks_on_market_shock_and_high_volatility():
+    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, 5, TP)
+    g = risk.gate(p, atr_pct=6, market={"shock": True}, risk=RISK, exposure=0)
     failed = {c["name"] for c in g["checks"] if not c["pass"]}
-    assert failed == {"04 최대손실", "05 변동성"} and g["verdict"].startswith("차단")
+    assert failed == {"05 변동성"} and g["verdict"].startswith("차단")
 
 
 def test_risk_gate_blocks_total_exposure():
-    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, 2.0)
+    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, 5, TP)
     g = risk.gate(p, atr_pct=2, market={"shock": False}, risk=RISK, exposure=5_500_000)
     assert not g["checks"][1]["pass"]
 
@@ -75,7 +80,19 @@ def test_market_regime_and_shock():
 
 def test_exit_counts_stop_first_when_both_hit():
     bars = _frame([100, 100], spread=0.2)   # 하루에 ±20% 흔들림 → 손절·목표 모두 닿음
-    assert backtest.simulate_exit(bars, 100, 90, 110, 20)["result"] == "손절"
+    assert backtest.simulate_exit(bars, 100, 90, [[110, 1.0]], 20)["result"] == "손절"
+
+
+def test_two_stage_take_profit_blends_exit():
+    bars = _frame([100, 111, 116], spread=0.0)    # +11%에 1차, +16%에 2차
+    out = backtest.simulate_exit(bars, 100, 95, [[110, 0.5], [115, 0.5]], 20)
+    assert out["result"] == "익절 완료" and out["exit"] == (111 * 0.5 + 116 * 0.5)
+
+
+def test_first_take_profit_then_stop():
+    bars = _frame([100, 111, 90], spread=0.0)
+    out = backtest.simulate_exit(bars, 100, 95, [[110, 0.5], [115, 0.5]], 20)
+    assert out["result"] == "1차 익절 후 손절" and out["exit"] == 111 * 0.5 + 90 * 0.5
 
 
 def test_stats_win_rate_and_drawdown():
@@ -87,8 +104,8 @@ def test_stats_win_rate_and_drawdown():
 
 
 def test_backtest_runs_without_future_data():
-    trades = backtest.run(_frame([100 * 1.004 ** i for i in range(300)]), target_rr=2.0)
-    assert trades and all(t["result"] in ("목표", "손절", "기간만료") for t in trades)
+    trades = backtest.run(_frame([100 * 1.004 ** i for i in range(300)]), 5, TP)
+    assert trades and all(t["result"] != "진행중" for t in trades)
 
 
 def test_build_universe_merges_watchlist_and_top():
@@ -104,14 +121,14 @@ def test_market_shock_is_plain_bool():
 
 def _pos(**kw):
     return {"id": 1, "approved_on": "2024-01-01", "ticker": "X", "name": "X", "setup": "돌파",
-            "entry_zone": [99, 101], "stop": 95, "target": 110, "shares": 10, "status": "대기", **kw}
+            "entry_zone": [99, 101], "stop": 95, "targets": [[110, 0.5], [115, 0.5]], "shares": 10, "status": "대기", **kw}
 
 
 def test_paper_fills_in_zone_and_hits_target():
     from aisec.paper import settle
-    bars = _frame([100, 100, 105, 112], spread=0.0)     # 1/1 승인 → 1/2 시가 100 체결 → 1/4 112 목표
+    bars = _frame([100, 100, 105, 112, 116], spread=0.0)   # 1/2 시가 100 체결 → 112에 1차, 116에 2차
     p = settle(_pos(), bars, 20)
-    assert p["status"] == "청산" and p["result"] == "목표" and p["fill_price"] == 100 and p["pnl"] > 0
+    assert p["status"] == "청산" and p["result"] == "익절 완료" and p["fill_price"] == 100 and p["pnl"] > 0
 
 
 def test_paper_does_not_chase_gap_up():
@@ -133,14 +150,16 @@ def test_holdings_trims_to_exposure_limit_closest_to_stop_first():
     res = review(pf, {"A": 120600, "B": 200500}, {**RISK, "max_total_exposure_pct": 70})
     a, b = res["rows"]
     assert a["action"] == "보유 유지" and b["sell"] == 10      # B가 손절선에 더 가까움
+    assert b["stop"] == 199500 and b["targets"] == [[231000, 0.5], [241500, 0.5]]   # -5%, +10%/+15%
     assert res["after_pct"] <= 70
 
 
 def test_holdings_stop_breach_sells_all_and_trend_broken_trimmed_first():
     from aisec.holdings import review
     pf = {"A": {"shares": 10, "avg_price": 100000}, "B": {"shares": 10, "avg_price": 100000}}
-    res = review(pf, {"A": 92000, "B": 99000}, {**RISK, "max_total_exposure_pct": 100})
-    assert res["rows"][0]["action"] == "전량 매도"           # -8% → 손절선(-7%) 이탈
+    res = review(pf, {"A": 94000, "B": 112000}, {**RISK, "stop_loss_pct": 5, "max_total_exposure_pct": 100})
+    assert res["rows"][0]["action"] == "전량 매도"           # -6% → 손절선(-5%) 이탈
+    assert res["rows"][1]["action"] == "5주 익절"            # +12% → 1차 익절가(+10%) 도달, 절반
     res = review(pf, {"A": 99000, "B": 99000}, {**RISK, "capital": 1_500_000, "max_total_exposure_pct": 70},
                  trends={"A": False, "B": True})
     assert res["rows"][1]["sell"] > 0 and res["rows"][0]["sell"] == 0   # 추세 이탈 B 먼저

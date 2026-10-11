@@ -74,13 +74,14 @@ def main() -> int:
             print(f"  - {msg}", file=sys.stderr)
         return 2
 
-    rr, hold, rcfg = cfg["plan"]["target_rr"], cfg["plan"]["max_hold_days"], cfg["risk"]
+    tp, hold, rcfg = cfg["plan"]["take_profit"], cfg["plan"]["max_hold_days"], cfg["risk"]
+    sl = rcfg["stop_loss_pct"]
     held = exposure(cfg.get("portfolio"), {t: s["close"] for t, s in snaps.items()})
 
     # 백테스트: 전 종목 3년치 → 셋업별 성적 (전체 합산 + 종목별)
     all_trades, ticker_trades = [], {}
     for t, df in frames.items():
-        ticker_trades[t] = backtest.run(df, rr, hold)
+        ticker_trades[t] = backtest.run(df, sl, tp, hold)
         all_trades += ticker_trades[t]
     pooled = backtest.by_setup(all_trades, rcfg["risk_per_trade_pct"])
 
@@ -91,7 +92,7 @@ def main() -> int:
         last = f.iloc[-1]
         atr_pct = float(last["atr"] / last["close"] * 100)
         for s in setups.detect(last):
-            p = plan.make_plan(float(last["close"]), s, rr)
+            p = plan.make_plan(float(last["close"]), s, sl, tp)
             g = risk.gate(p, atr_pct, mkt, rcfg, held)
             mine = [x for x in ticker_trades[t] if x["setup"] == s["setup"]]
             candidates.append({
@@ -131,7 +132,7 @@ def main() -> int:
             last = setups.features(frames[t]).iloc[-1]
             trends[t] = bool(last["ma20"] < last["ma60"] and last["close"] < last["ma60"])
         prices = {t: round(float(frames[t]["종가"].iloc[-1])) for t in pf}
-        hres = holdings.review(pf, prices, rcfg, trends, rr)
+        hres = holdings.review(pf, prices, rcfg, trends, tp)
         (out / "holdings.md").write_text(holdings.render(hres, f"{snaps[next(iter(pf))]['date']} 종가"), encoding="utf-8")
     elif pf:
         failures["holdings"] = f"보유 종목 시세 일부를 받지 못해 점검을 건너뜁니다: {[t for t in pf if t not in frames]}"

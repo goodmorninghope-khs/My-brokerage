@@ -16,7 +16,7 @@
 | 2. 분석부 (VERIFY) | AI | `.claude/agents/analysis-desk.md` | 셋업이 진짜인지 차트·실적·수급·백테스트로 검증 |
 | 3. 마켓부 (REGIME) | 코드+AI | `aisec/market.py`, `market-desk.md` | 코스피 국면 판정, 오늘의 공격/중립/방어 태세 |
 | 4. 리스크관리부 (GUARD) | 코드 | `aisec/risk.py` | 5기준(투자비중·총노출·손익비·최대손실·변동성) 통과/차단. **AI가 못 뒤집음** |
-| 5. 운용부 (PLAN) | 코드 | `aisec/plan.py` | 진입 구간·손절가·목표가·무효화 조건·손익비 |
+| 5. 운용부 (PLAN) | 코드 | `aisec/plan.py` | 진입 구간·손절가(-5%)·익절가(+10% 절반, +15% 나머지)·무효화 조건·손익비 |
 | 6. 자가학습부 (LEARN) | 코드 | `aisec/backtest.py`, `aisec/review.py` | 3년 백테스트(승률·손익비·최대낙폭), 지난 계획 채점 |
 | + 뉴스공시부 | AI | `news-desk.md` | 최근 7일 뉴스·공시 (출처 링크 필수) |
 | + 반대편부 | AI | `redteam-desk.md` | 사면 안 되는 이유를 일부러 찾음 |

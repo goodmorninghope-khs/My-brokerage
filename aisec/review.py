@@ -25,7 +25,7 @@ def main(max_hold: int = 20) -> int:
                 print(f"건너뜀: {e}", file=sys.stderr)
                 continue
             after = df[df.index > day]
-            out = simulate_exit(after, p["entry"], p["stop"], p["target"], max_hold) if len(after) else {"result": "진행중"}
+            out = simulate_exit(after, p["entry"], p["stop"], p.get("targets") or [[p["target"], 1.0]], max_hold) if len(after) else {"result": "진행중"}
             rows.append({"date": day, "ticker": p["ticker"], "name": p["name"], "setup": p["setup"],
                          "verdict": p["verdict"], "result": out["result"]})
     if not rows:
@@ -33,11 +33,11 @@ def main(max_hold: int = 20) -> int:
         return 0
     lines = ["# 자가학습 채점표", "", "| 날짜 | 종목 | 셋업 | 리스크 판정 | 결과 |", "|---|---|---|---|---|"]
     lines += [f"| {r['date']} | {r['name']} | {r['setup']} | {r['verdict']} | {r['result']} |" for r in rows]
-    done = [r for r in rows if r["result"] in ("목표", "손절", "기간만료")]
+    done = [r for r in rows if r["result"] != "진행중"]
     for setup in sorted({r["setup"] for r in done}):
         s = [r for r in done if r["setup"] == setup]
-        hit = sum(r["result"] == "목표" for r in s)
-        lines.append(f"\n- {setup}: 끝난 계획 {len(s)}건 중 목표 도달 {hit}건")
+        hit = sum("익절" in r["result"] for r in s)
+        lines.append(f"\n- {setup}: 끝난 계획 {len(s)}건 중 익절(1차 이상) {hit}건")
     out = ROOT / "reports" / "review.md"
     out.parent.mkdir(exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")

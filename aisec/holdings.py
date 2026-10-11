@@ -4,6 +4,7 @@
 
 규칙 (우선순위 순):
 1. 종가가 손절선(평균단가 -stop_loss_pct%) 이하 → 전량 매도 제안
+   종가가 익절가(평균단가 +10%, +15%) 이상 → 단계별 익절 제안 (1차: 절반, 2차: 나머지)
 2. 주식 비중이 총노출 한도를 넘으면 → 초과분만큼 축소 제안
    축소 순서: 추세 이탈(20일선 < 60일선이고 종가 < 60일선) 종목 먼저, 그다음 손절선에 가까운 종목 먼저
 3. 나머지 → 보유 유지, 손절선·목표가 안내
@@ -18,10 +19,14 @@ from pathlib import Path
 
 import yaml
 
+from .backtest import targets_for
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None, target_rr: float = 2.0) -> dict:
+def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None,
+           take_profit: list | None = None) -> dict:
+    take_profit = take_profit or [[10, 0.5], [15, 0.5]]
     trends = trends or {}
     capital, stop_pct = risk["capital"], risk["stop_loss_pct"]
     rows = []
@@ -32,7 +37,7 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
             "ticker": t, "name": h.get("name", t), "shares": h["shares"], "avg_price": avg, "price": px,
             "value": px * h["shares"], "pnl": (px - avg) * h["shares"], "pnl_pct": round((px / avg - 1) * 100, 2),
             "stop": stop, "to_stop_pct": round((stop / px - 1) * 100, 2),
-            "target": round(avg + target_rr * (avg - stop)),
+            "targets": targets_for(avg, take_profit),
             "trend_broken": trends.get(t), "sell": 0, "action": "보유 유지", "reasons": [],
         })
 
@@ -40,6 +45,13 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
         if r["price"] <= r["stop"]:
             r.update(sell=r["shares"], action="전량 매도")
             r["reasons"].append(f"손절선 {r['stop']:,}원 이탈")
+
+        elif r["price"] >= r["targets"][0][0]:  # 익절 단계
+            reached = [t for t in r["targets"] if r["price"] >= t[0]]
+            portion = sum(t[1] for t in reached)
+            n = r["shares"] if portion >= 1 else math.floor(r["shares"] * portion)
+            r.update(sell=n, action="전량 익절" if n == r["shares"] else f"{n}주 익절")
+            r["reasons"].append(f"{len(reached)}차 익절가 {reached[-1][0]:,}원 도달")
 
     total = sum(r["value"] for r in rows)
     limit = capital * risk["max_total_exposure_pct"] / 100
@@ -66,7 +78,7 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
                                 f"한도에 맞추려면 {keep}주까지 줄여야 함. 참고만, 강제 아님")
         if r["after_shares"]:
             r["reasons"].append(f"남은 {r['after_shares']}주: 손절선 {r['stop']:,}원(현재가 대비 {r['to_stop_pct']}%), "
-                                f"목표가 {r['target']:,}원")
+                                "익절가 " + " → ".join(f"{t[0]:,}원({int(t[1] * 100)}%)" for t in r["targets"]))
     after = sum(r["after_shares"] * r["price"] for r in rows)
     return {
         "before_pct": round(total / capital * 100, 1), "after_pct": round(after / capital * 100, 1),
@@ -98,7 +110,7 @@ def main(argv: list[str]) -> int:
     if missing:
         print(f"가격이 필요합니다: {missing}  예) python -m aisec.holdings 052690=120600", file=sys.stderr)
         return 1
-    print(render(review(cfg["portfolio"], prices, cfg["risk"], target_rr=cfg["plan"]["target_rr"]), "수동 입력 가격"))
+    print(render(review(cfg["portfolio"], prices, cfg["risk"], take_profit=cfg["plan"]["take_profit"]), "수동 입력 가격"))
     return 0
 
 
