@@ -36,7 +36,7 @@ risk:
   capital: 10000000          # 투자금 1,000만 원 (신한 계좌에서 운용 중인 금액)
   risk_per_trade_pct: 1      # 한 번 손절로 잃어도 되는 돈 = 자산의 1%
   max_position_pct: 10       # 01 투자비중: 한 종목 최대 10%
-  max_total_exposure_pct: 60 # 02 총노출: 주식 비중 최대 60% (나머지 현금)
+  max_total_exposure_pct: 70 # 02 총노출: 주식 70% · 현금 30% 원칙
   min_rr: 2.0                # 03 손익비: 최소 1:2
   stop_loss_pct: 7           # 04 최대손실: 손절폭 최대 -7%
   max_atr_pct: 5             # 05 변동성: 하루 평균 변동폭(ATR) 5% 초과 종목은 차단

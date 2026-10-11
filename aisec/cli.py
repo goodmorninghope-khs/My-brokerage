@@ -10,7 +10,7 @@ from pathlib import Path
 
 import yaml
 
-from . import backtest, data, indicators, market, plan, risk, setups
+from . import backtest, data, holdings, indicators, market, plan, risk, setups
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -122,6 +122,19 @@ def main() -> int:
             "```", "", "## 최근 20거래일 일봉", "```", recent.to_string(), "```",
         ]
         (out / f"dossier_{t}.md").write_text("\n".join(doc), encoding="utf-8")
+
+    # 보유 종목 점검: 실제 종가와 추세(20일선<60일선, 종가<60일선)로 원칙 제안
+    pf = cfg.get("portfolio") or {}
+    if pf and all(t in frames for t in pf):
+        trends = {}
+        for t in pf:
+            last = setups.features(frames[t]).iloc[-1]
+            trends[t] = bool(last["ma20"] < last["ma60"] and last["close"] < last["ma60"])
+        prices = {t: round(float(frames[t]["종가"].iloc[-1])) for t in pf}
+        hres = holdings.review(pf, prices, rcfg, trends, rr)
+        (out / "holdings.md").write_text(holdings.render(hres, f"{snaps[next(iter(pf))]['date']} 종가"), encoding="utf-8")
+    elif pf:
+        failures["holdings"] = f"보유 종목 시세 일부를 받지 못해 점검을 건너뜁니다: {[t for t in pf if t not in frames]}"
 
     plans = [{"ticker": c["ticker"], "name": c["name"], "verdict": c["risk"]["verdict"], "shares": c["risk"]["shares"], **c["plan"]} for c in candidates]
     (out / "plans.json").write_text(json.dumps(plans, ensure_ascii=False, indent=2), encoding="utf-8")

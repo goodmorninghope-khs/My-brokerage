@@ -125,3 +125,22 @@ def test_paper_holding_shows_unrealized_pnl():
     p = settle(_pos(), _frame([100, 100, 102], spread=0.0), 20)
     assert p["status"] == "보유" and p["pnl"] == 20
     assert "보유 1건" in scorecard([p])
+
+
+def test_holdings_trims_to_exposure_limit_closest_to_stop_first():
+    from aisec.holdings import review
+    pf = {"A": {"name": "A", "shares": 40, "avg_price": 124100}, "B": {"name": "B", "shares": 20, "avg_price": 210000}}
+    res = review(pf, {"A": 120600, "B": 200500}, {**RISK, "max_total_exposure_pct": 70})
+    a, b = res["rows"]
+    assert a["action"] == "보유 유지" and b["sell"] == 10      # B가 손절선에 더 가까움
+    assert res["after_pct"] <= 70
+
+
+def test_holdings_stop_breach_sells_all_and_trend_broken_trimmed_first():
+    from aisec.holdings import review
+    pf = {"A": {"shares": 10, "avg_price": 100000}, "B": {"shares": 10, "avg_price": 100000}}
+    res = review(pf, {"A": 92000, "B": 99000}, {**RISK, "max_total_exposure_pct": 100})
+    assert res["rows"][0]["action"] == "전량 매도"           # -8% → 손절선(-7%) 이탈
+    res = review(pf, {"A": 99000, "B": 99000}, {**RISK, "capital": 1_500_000, "max_total_exposure_pct": 70},
+                 trends={"A": False, "B": True})
+    assert res["rows"][1]["sell"] > 0 and res["rows"][0]["sell"] == 0   # 추세 이탈 B 먼저
