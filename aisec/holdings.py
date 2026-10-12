@@ -79,7 +79,8 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
                                 f"한도에 맞추려면 {keep}주까지 줄여야 함. 참고만, 강제 아님")
         if r["after_shares"]:
             r["reasons"].append(f"남은 {r['after_shares']}주: 손절선 {r['stop']:,}원(현재가 대비 {r['to_stop_pct']}%), "
-                                "익절가 " + " → ".join(f"{t[0]:,}원({int(t[1] * 100)}%)" for t in r["targets"]))
+                                ("익절가 " + " → ".join(f"{t[0]:,}원({int(t[1] * 100)}%)" for t in r["targets"])
+                                 if r["after_shares"] > 1 else f"익절가 {r['targets'][0][0]:,}원(1주 전량)"))
     after = sum(r["after_shares"] * r["price"] for r in rows)
     return {
         "before_pct": round(total / capital * 100, 1), "after_pct": round(after / capital * 100, 1),
