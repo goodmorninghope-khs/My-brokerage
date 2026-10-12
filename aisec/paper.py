@@ -43,7 +43,8 @@ def approve(day: str, ticker: str, ledger: list[dict]) -> dict:
         raise SystemExit(f"{p['name']}은(는) 리스크관리부 '차단' 종목이라 승인할 수 없습니다.")
     if any(x["ticker"] == ticker and x["status"] in ("대기", "보유") for x in ledger):
         raise SystemExit(f"{p['name']}은(는) 이미 장부에 진행 중인 거래가 있습니다.")
-    pos = {"id": len(ledger) + 1, "approved_on": day, "ticker": ticker, "name": p["name"], "setup": p["setup"],
+    # 장중 재계산 폴더(예: 2026-10-12-0924)도 받되, 승인일은 날짜 부분만 씁니다.
+    pos = {"id": len(ledger) + 1, "approved_on": day[:10], "plan_source": day, "ticker": ticker, "name": p["name"], "setup": p["setup"],
            "entry_zone": p["entry_zone"], "stop": p["stop"], "targets": p["targets"], "shares": p["shares"],
            "status": "대기"}
     ledger.append(pos)
