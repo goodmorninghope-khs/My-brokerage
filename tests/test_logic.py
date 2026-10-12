@@ -217,3 +217,13 @@ def test_holdings_single_share_takes_profit_at_first_target():
     from aisec.holdings import review
     res = review({"A": {"shares": 1, "avg_price": 100000}}, {"A": 111000}, {**RISK, "max_total_exposure_pct": 100})
     assert res["rows"][0]["sell"] == 1
+
+
+def test_risk_gate_blocks_during_pause():
+    import datetime
+    p = plan.make_plan(10000, {"setup": "돌파", "stop": 9500, "why": ""}, 5, TP)
+    far = (datetime.date.today() + datetime.timedelta(days=30)).isoformat()
+    g = risk.gate(p, atr_pct=2, market={"shock": False}, risk={**RISK, "pause_until": far}, exposure=0)
+    assert g["verdict"].startswith("차단") and g["checks"][-1]["name"] == "06 휴식"
+    g = risk.gate(p, atr_pct=2, market={"shock": False}, risk={**RISK, "pause_until": "2000-01-01"}, exposure=0)
+    assert g["verdict"].startswith("통과")

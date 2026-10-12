@@ -26,6 +26,11 @@ def gate(plan: dict, atr_pct: float, market: dict, risk: dict, exposure: float) 
         ("05 변동성", atr_pct <= risk["max_atr_pct"] and not market.get("shock", False),
          f"하루 평균 변동폭 {atr_pct:.1f}% (한도 {risk['max_atr_pct']}%), 시장 급변 {'있음' if market.get('shock') else '없음'}"),
     ]
+    pause = risk.get("pause_until")
+    if pause:
+        from .data import today_kst
+        resting = today_kst() <= (pause if hasattr(pause, "year") else __import__("datetime").date.fromisoformat(str(pause)))
+        checks.append(("06 휴식", not resting, f"{pause}까지 실전 신규 매수 쉬기 (모의투자만)" if resting else "휴식 기간 아님"))
     return {
         "verdict": "통과 → 승인 요청" if all(ok for _, ok, _ in checks) else "차단 → 매매 보류",
         "shares": shares,
