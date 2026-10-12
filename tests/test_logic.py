@@ -179,3 +179,35 @@ def test_near_breakout_and_pullback_signals():
     closes = [100 * 1.003 ** i for i in range(200)] + [100 * 1.003 ** 199 * 0.99]
     found = {n["setup"]: n for n in setups.near(setups.features(_frame(closes, spread=0.002)).iloc[-1])}
     assert "돌파" in found and found["돌파"]["gap_pct"] > 0
+
+
+def _ohlc(rows):
+    idx = pd.date_range("2024-01-01", periods=len(rows), freq="B")
+    return pd.DataFrame(rows, columns=["시가", "고가", "저가", "종가"], index=idx).assign(거래량=1000)
+
+
+def test_candle_hammer_after_decline():
+    from aisec.candles import patterns
+    rows = [(110 - i, 111 - i, 109 - i, 110 - i) for i in range(8)]   # 하락
+    rows.append((101.5, 102, 95, 102))                                # 긴 아래꼬리, 윗꼬리 거의 없음
+    assert patterns(_ohlc(rows))["망치형"].iloc[-1]
+
+
+def test_candle_hammer_ignored_without_prior_decline():
+    from aisec.candles import patterns
+    rows = [(100 + i, 101 + i, 99 + i, 100 + i) for i in range(8)]   # 상승
+    rows.append((108.5, 109, 102, 109))
+    assert not patterns(_ohlc(rows))["망치형"].iloc[-1]
+
+
+def test_candle_bullish_and_bearish_engulfing():
+    from aisec.candles import patterns
+    down = [(110 - i, 111 - i, 109 - i, 110 - i) for i in range(7)] + [(104, 104.5, 101, 101.5), (101, 106, 100.5, 105)]
+    assert patterns(_ohlc(down))["상승장악형"].iloc[-1]
+    up = [(100 + i, 101 + i, 99 + i, 100 + i) for i in range(7)] + [(106, 109.5, 105.5, 109), (109.5, 110, 104, 105)]
+    assert patterns(_ohlc(up))["하락장악형"].iloc[-1]
+
+
+def test_candle_backtest_runs():
+    trades = backtest.run_candles(_frame([100 * (1.01 if i % 7 else 0.95) ** (i % 10) for i in range(300)]), 5, TP)
+    assert all(t["result"] != "진행중" for t in trades)

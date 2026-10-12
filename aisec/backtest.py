@@ -96,3 +96,29 @@ def stats(trades: list[dict], risk_pct: float = 1.0) -> dict:
 def by_setup(trades: list[dict], risk_pct: float = 1.0) -> dict:
     return {name: stats([t for t in trades if t["setup"] == name], risk_pct)
             for name in sorted({t["setup"] for t in trades})}
+
+
+def run_candles(df: pd.DataFrame, stop_loss_pct: float, take_profit: list, max_hold: int = 20) -> list[dict]:
+    """상승 반전 캔들이 나온 다음 날 시가에 샀다면? 손절은 신호 캔들 저가와 -N% 중 가까운 쪽."""
+    from .candles import BULLISH, patterns
+    p = patterns(df)
+    trades, busy_until = [], None
+    for i in range(len(df) - 1):
+        day = df.index[i]
+        if busy_until is not None and day <= busy_until:
+            continue
+        hits = [n for n in BULLISH if p[n].iloc[i]]
+        if not hits:
+            continue
+        entry = float(df["시가"].iloc[i + 1])
+        stop = max(float(df["저가"].iloc[i]), entry * (1 - stop_loss_pct / 100))
+        if entry <= stop:
+            continue
+        out = simulate_exit(df.iloc[i + 1:], entry, stop, targets_for(entry, take_profit), max_hold)
+        if out["result"] == "진행중":
+            continue
+        ret = (out["exit"] / entry - 1) * 100 - COST_PCT
+        trades.append({"setup": hits[0], "date": day, "entry": entry, "ret_pct": ret,
+                       "r": (out["exit"] - entry) / (entry - stop), **out})
+        busy_until = out["exit_date"]
+    return trades

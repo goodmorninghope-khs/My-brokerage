@@ -14,7 +14,7 @@ watchlist:
 # 시가총액 상위 종목도 매일 아침 KRX에서 새로 받아 관심종목에 더합니다.
 # (순위가 바뀌므로 목록을 고정하지 않습니다. KRX 접속이 안 되면 위 관심종목만 분석)
 market_cap_top:
-  count: 20                 # 상위 몇 위까지
+  count: 50                 # 상위 몇 위까지
   market: ALL               # KOSPI / KOSDAQ / ALL
   exclude_preferred: true   # 삼성전자우 같은 우선주 제외
 

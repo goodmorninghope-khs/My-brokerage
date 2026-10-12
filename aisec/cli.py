@@ -10,7 +10,7 @@ from pathlib import Path
 
 import yaml
 
-from . import backtest, data, holdings, indicators, market, plan, risk, setups
+from . import backtest, candles, data, holdings, indicators, market, plan, risk, setups
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -31,9 +31,11 @@ def exposure(portfolio: dict, last_close: dict) -> float:
 
 
 def rank_key(c: dict) -> tuple:
+    """순위: 리스크 통과 > 하락 캔들 경고 없음 > 검증된 상승 캔들 > 종목 백테스트 양수 > 평균 수익."""
     bt = c["backtest_ticker"]
     passed = c["risk"]["verdict"].startswith("통과")
-    return (passed, bt.get("trades", 0) >= 5 and bt.get("avg_ret_pct", -99) > 0, bt.get("avg_ret_pct", -99))
+    return (passed, not c.get("candle_warning"), bool(c.get("candle_bonus")),
+            bt.get("trades", 0) >= 5 and bt.get("avg_ret_pct", -99) > 0, bt.get("avg_ret_pct", -99))
 
 
 def main() -> int:
@@ -87,6 +89,20 @@ def main() -> int:
         all_trades += ticker_trades[t]
     pooled = backtest.by_setup(all_trades, rcfg["risk_per_trade_pct"])
 
+    # 캔들 백테스트: 상승 반전 캔들이 우리 종목에서 실제로 통했나? 통한 것만 '검증된 캔들'
+    candle_trades = []
+    for df in frames.values():
+        candle_trades += backtest.run_candles(df, sl, tp, hold)
+    candle_stats = backtest.by_setup(candle_trades, rcfg["risk_per_trade_pct"])
+    validated = {n for n, st in candle_stats.items() if st.get("reliable") and st.get("avg_ret_pct", -1) > 0}
+    recent_candles = {t: candles.recent(df, 3) for t, df in frames.items()}
+
+    def candle_flags(t: str) -> tuple[bool, bool]:
+        rc, last_day = recent_candles[t], snaps[t]["date"]
+        bonus = any(x["date"] == last_day and x["pattern"] in validated for x in rc)
+        warning = any(x["kind"] == "하락" for x in rc[:2])
+        return bonus, warning
+
     # 오늘 셋업 → 운용 계획 → 리스크 5기준
     candidates, waiting = [], []
     for t, df in frames.items():
@@ -96,13 +112,24 @@ def main() -> int:
             for n in setups.near(last):
                 waiting.append({"ticker": t, "name": snaps[t]["name"], "close": round(float(last["close"])), **n,
                                 "backtest_all": pooled.get(n["setup"], {"trades": 0})})
+            # 캔들 신호만 있고 셋업은 없는 종목: 다음 날 신호 캔들 고가를 넘으면 '확인'
+            for x in recent_candles[t]:
+                if x["date"] == snaps[t]["date"] and x["pattern"] in validated:
+                    hi = round(float(df["고가"].iloc[-1]))
+                    waiting.append({"ticker": t, "name": snaps[t]["name"], "close": round(float(last["close"])),
+                                    "setup": f"캔들:{x['pattern']}", "trigger": hi,
+                                    "gap_pct": round((hi / float(last["close"]) - 1) * 100, 2),
+                                    "condition": f"{x['meaning']}. 다음 날 이 고가를 넘으면 신호 확인",
+                                    "backtest_all": candle_stats.get(x["pattern"], {"trades": 0})})
         atr_pct = float(last["atr"] / last["close"] * 100)
         for s in setups.detect(last):
             p = plan.make_plan(float(last["close"]), s, sl, tp)
             g = risk.gate(p, atr_pct, mkt, rcfg, held)
             mine = [x for x in ticker_trades[t] if x["setup"] == s["setup"]]
+            bonus, warning = candle_flags(t)
             candidates.append({
                 "ticker": t, "name": snaps[t]["name"], "plan": p, "risk": g, "atr_pct": round(atr_pct, 2),
+                "candles": recent_candles[t], "candle_bonus": bonus, "candle_warning": warning,
                 "backtest_ticker": backtest.stats(mine, rcfg["risk_per_trade_pct"]),
                 "backtest_all": pooled.get(s["setup"], {"trades": 0}),
             })
@@ -124,6 +151,9 @@ def main() -> int:
             "", "## 리스크관리부 5기준", "```json", json.dumps(c["risk"], ensure_ascii=False, indent=2), "```",
             "", "## 백테스트 (이 종목·이 셋업, 최근 3년)", "```json", json.dumps(c["backtest_ticker"], ensure_ascii=False, indent=2), "```",
             "", "## 백테스트 (전 종목 합산·이 셋업)", "```json", json.dumps(c["backtest_all"], ensure_ascii=False, indent=2), "```",
+            "", "## 캔들 신호 (최근 3거래일, 최신 먼저)", "```json",
+            json.dumps({"recent": c["candles"], "검증된_상승캔들_가점": c["candle_bonus"], "하락캔들_경고": c["candle_warning"]},
+                       ensure_ascii=False, indent=2), "```",
             "", "## 수급·펀더멘털 (KRX 로그인 없으면 null)", "```json",
             json.dumps({"foreign_net_5d": data.foreign_net_5d(t), "fundamental": data.fundamental(t)}, ensure_ascii=False, indent=2),
             "```", "", "## 최근 20거래일 일봉", "```", recent.to_string(), "```",
@@ -139,7 +169,12 @@ def main() -> int:
             trends[t] = bool(last["ma20"] < last["ma60"] and last["close"] < last["ma60"])
         prices = {t: round(float(frames[t]["종가"].iloc[-1])) for t in pf}
         hres = holdings.review(pf, prices, rcfg, trends, tp)
-        (out / "holdings.md").write_text(holdings.render(hres, f"{snaps[next(iter(pf))]['date']} 종가"), encoding="utf-8")
+        text = holdings.render(hres, f"{snaps[next(iter(pf))]['date']} 종가")
+        notes = [f"- 캔들 {pf[t].get('name', t)}: " + ", ".join(f"{x['date']} {x['pattern']}({x['kind']})" for x in recent_candles[t])
+                 for t in pf if recent_candles[t]]
+        if notes:
+            text += "\n\n### 보유 종목 캔들 신호 (최근 3거래일)\n" + "\n".join(notes)
+        (out / "holdings.md").write_text(text, encoding="utf-8")
     elif pf:
         failures["holdings"] = f"보유 종목 시세 일부를 받지 못해 점검을 건너뜁니다: {[t for t in pf if t not in frames]}"
 
@@ -154,7 +189,9 @@ def main() -> int:
                       for c in picks if c["risk"]["verdict"].startswith("통과")][: rcfg.get("max_daily_new_buys", 1)],
         # 대기 목록: 신호 가격까지 가까운 순
         "waiting": sorted(waiting, key=lambda w: abs(w["gap_pct"]))[:5],
-        "backtest_by_setup": pooled, "universe": snaps, "failures": failures,
+        "backtest_by_setup": pooled,
+        "candle_backtest": candle_stats, "validated_candles": sorted(validated),
+        "candles_today": {t: rc for t, rc in recent_candles.items() if rc and rc[0]["date"] == snaps[t]["date"]}, "universe": snaps, "failures": failures,
     }
     (out / "screen.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     print(f"완료: {len(frames)}종목 수집, 셋업 성립 {len(candidates)}건, 회의 상정 {len(picks)}건, 시장 {mkt['regime']} → {out}")
