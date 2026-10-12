@@ -211,3 +211,9 @@ def test_candle_bullish_and_bearish_engulfing():
 def test_candle_backtest_runs():
     trades = backtest.run_candles(_frame([100 * (1.01 if i % 7 else 0.95) ** (i % 10) for i in range(300)]), 5, TP)
     assert all(t["result"] != "진행중" for t in trades)
+
+
+def test_holdings_single_share_takes_profit_at_first_target():
+    from aisec.holdings import review
+    res = review({"A": {"shares": 1, "avg_price": 100000}}, {"A": 111000}, {**RISK, "max_total_exposure_pct": 100})
+    assert res["rows"][0]["sell"] == 1

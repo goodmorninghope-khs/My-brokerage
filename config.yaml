@@ -46,6 +46,7 @@ risk:
   max_daily_new_buys: 1
 
 # 지금 들고 있는 종목 (총노출 계산용). 예: "005930": {shares: 10, avg_price: 70000}
-# (2026-10-12 갱신: LG전자·한전기술 손절 후 삼성전자 5주 매수)
+# (2026-10-12 갱신: LG전자·한전기술 손절 후 삼성전자 5주, SK하이닉스 1주 매수)
 portfolio:
   "005930": {name: 삼성전자, shares: 5, avg_price: 251000}
+  "000660": {name: SK하이닉스, shares: 1, avg_price: 1610000}

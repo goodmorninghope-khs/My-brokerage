@@ -49,7 +49,8 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
         elif r["price"] >= r["targets"][0][0]:  # 익절 단계
             reached = [t for t in r["targets"] if r["price"] >= t[0]]
             portion = sum(t[1] for t in reached)
-            n = r["shares"] if portion >= 1 else math.floor(r["shares"] * portion)
+            # 나눠 팔 수 없을 만큼 적으면(예: 1주) 1차 익절가에서 최소 1주를 팝니다.
+            n = r["shares"] if portion >= 1 else max(1, math.floor(r["shares"] * portion))
             r.update(sell=n, action="전량 익절" if n == r["shares"] else f"{n}주 익절")
             r["reasons"].append(f"{len(reached)}차 익절가 {reached[-1][0]:,}원 도달")
 
