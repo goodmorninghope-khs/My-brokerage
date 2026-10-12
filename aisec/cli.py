@@ -38,7 +38,9 @@ def rank_key(c: dict) -> tuple:
 
 def main() -> int:
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text(encoding="utf-8"))
-    out = ROOT / "data" / data.today_kst().isoformat()
+    # 장중 재계산은 python -m aisec.cli 1430 처럼 꼬리표를 붙여 아침 기록을 덮어쓰지 않게 합니다.
+    tag = f"-{sys.argv[1]}" if len(sys.argv) > 1 else ""
+    out = ROOT / "data" / f"{data.today_kst().isoformat()}{tag}"
     out.mkdir(parents=True, exist_ok=True)
     failures = {}
 
@@ -86,10 +88,14 @@ def main() -> int:
     pooled = backtest.by_setup(all_trades, rcfg["risk_per_trade_pct"])
 
     # 오늘 셋업 → 운용 계획 → 리스크 5기준
-    candidates = []
+    candidates, waiting = [], []
     for t, df in frames.items():
         f = setups.features(df)
         last = f.iloc[-1]
+        if t not in (cfg.get("portfolio") or {}):
+            for n in setups.near(last):
+                waiting.append({"ticker": t, "name": snaps[t]["name"], "close": round(float(last["close"])), **n,
+                                "backtest_all": pooled.get(n["setup"], {"trades": 0})})
         atr_pct = float(last["atr"] / last["close"] * 100)
         for s in setups.detect(last):
             p = plan.make_plan(float(last["close"]), s, sl, tp)
@@ -143,6 +149,11 @@ def main() -> int:
         "date": data.today_kst().isoformat(), "market": mkt, "risk_rules": rcfg,
         "picks": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"]} for c in picks],
         "other_candidates": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"]} for c in candidates if c not in picks],
+        # 오늘의 원칙 추천: 리스크 통과 후보 중 1순위 (하루 신규 매수 max_daily_new_buys 건)
+        "recommend": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"]}
+                      for c in picks if c["risk"]["verdict"].startswith("통과")][: rcfg.get("max_daily_new_buys", 1)],
+        # 대기 목록: 신호 가격까지 가까운 순
+        "waiting": sorted(waiting, key=lambda w: abs(w["gap_pct"]))[:5],
         "backtest_by_setup": pooled, "universe": snaps, "failures": failures,
     }
     (out / "screen.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")

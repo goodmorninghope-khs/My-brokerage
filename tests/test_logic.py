@@ -172,3 +172,10 @@ def test_holdings_position_limit_is_soft_warning_only():
     r = res["rows"][0]
     assert r["sell"] == 0 and r["weight_pct"] > 20
     assert any("유연" in why for why in r["reasons"])
+
+
+def test_near_breakout_and_pullback_signals():
+    # 상승 추세에서 20일 고점 바로 아래(돌파 임박)
+    closes = [100 * 1.003 ** i for i in range(200)] + [100 * 1.003 ** 199 * 0.99]
+    found = {n["setup"]: n for n in setups.near(setups.features(_frame(closes, spread=0.002)).iloc[-1])}
+    assert "돌파" in found and found["돌파"]["gap_pct"] > 0

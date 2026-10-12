@@ -16,7 +16,7 @@ description: 나의 AI 증권사 아침 브리핑. 숫자(스크리닝·셋업·
 
 2. **AI 부서 호출 (모두 한 번에 병렬)**
    - market-desk: 하루 1번.
-   - picks 종목마다: analysis-desk, news-desk, redteam-desk.
+   - picks 종목마다: analysis-desk, news-desk, redteam-desk. (추천 1순위는 반드시 세 부서 모두)
    - 보유 종목(config portfolio)마다: analysis-desk, redteam-desk (holdings.md 를 함께 읽게 합니다).
    각자에게 `data/<날짜>/` 경로와 담당 종목 코드를 알려 줍니다.
 
@@ -32,6 +32,9 @@ description: 나의 AI 증권사 아침 브리핑. 숫자(스크리닝·셋업·
    ## 한 줄 요약
    ## 보유 종목 점검 — data/<날짜>/holdings.md 를 그대로 붙이고, 종목마다 분석부·반대편부 한 줄 의견을 덧붙입니다.
       (규칙 제안은 바꾸지 않습니다. 매도·축소 실행 여부는 대표님 결재.)
+   ## 오늘의 원칙 추천 — screen.json recommend (리스크 5기준 통과 1순위). 없으면 "오늘은 추천 없음"과 이유.
+      종목·셋업·진입 구간·손절·익절·수량을 한 줄로, 부서 의견 요약 한 줄. 추천은 원칙의 답이지 수익 보장이 아님을 밝힙니다.
+   ## 대기 목록 — screen.json waiting: "이 가격이 오면 매수 신호" (종목 · 셋업 · 신호 가격 · 현재가 대비 % · 조건)
    ## 마켓부: 오늘의 국면과 태세
    ## 결재 카드
    ### <셋업> 셋업 · <종목명> (<코드>)   현재가 ____원

@@ -52,3 +52,20 @@ def detect(r: pd.Series) -> list[dict]:
     if r["rsi_min10"] < 30 and r["prev_close"] < r["prev_ma20"] and c > r["ma20"]:
         found.append(("반전", r["low10"] - 0.5 * atr, "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다"))
     return [{"setup": n, "stop": round(float(s)), "why": w} for n, s, w in found if s < c]
+
+
+def near(r: pd.Series) -> list[dict]:
+    """셋업 '임박' 목록: 아직 성립하지 않았지만 조건 하나만 남은 종목과 그 신호 가격."""
+    if r[["ma120", "atr", "high20_prev"]].isna().any():
+        return []
+    c, out = r["close"], []
+    uptrend = r["ma20"] > r["ma60"] and c > r["ma60"]
+    if uptrend and r["high20_prev"] * 0.97 <= c <= r["high20_prev"]:
+        out.append({"setup": "돌파", "trigger": round(float(r["high20_prev"])),
+                    "gap_pct": round((r["high20_prev"] / c - 1) * 100, 2),
+                    "condition": "이 가격을 거래량 1.5배 이상으로 넘으면 돌파 신호"})
+    if uptrend and r["ma20"] < c <= r["ma20"] * 1.03:
+        out.append({"setup": "눌림목", "trigger": round(float(r["ma20"])),
+                    "gap_pct": round((r["ma20"] / c - 1) * 100, 2),
+                    "condition": "20일선까지 내려와 지지받고(종가가 20일선 위) RSI 40~60이면 눌림목 신호"})
+    return out
