@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def main(max_hold: int = 20) -> int:
     rows = []
     for plans_file in sorted((ROOT / "data").glob("*/plans.json")):
-        day = plans_file.parent.name
+        day = plans_file.parent.name[:10]  # 장전 재계산 폴더(2026-10-12-0924)도 날짜만 씀
         for p in json.loads(plans_file.read_text(encoding="utf-8")):
             try:
                 df = data.ohlcv(p["ticker"], (data.today_kst() - date.fromisoformat(day)).days + 10, min_rows=1)
@@ -26,7 +26,7 @@ def main(max_hold: int = 20) -> int:
                 continue
             after = df[df.index > day]
             out = simulate_exit(after, p["entry"], p["stop"], p.get("targets") or [[p["target"], 1.0]], max_hold) if len(after) else {"result": "진행중"}
-            rows.append({"date": day, "ticker": p["ticker"], "name": p["name"], "setup": p["setup"],
+            rows.append({"date": plans_file.parent.name, "ticker": p["ticker"], "name": p["name"], "setup": p["setup"],
                          "verdict": p["verdict"], "result": out["result"]})
     if not rows:
         print("채점할 지난 계획이 없습니다.")
