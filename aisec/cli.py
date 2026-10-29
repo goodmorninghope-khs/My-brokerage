@@ -10,7 +10,7 @@ from pathlib import Path
 
 import yaml
 
-from . import backtest, candles, data, holdings, indicators, market, plan, risk, setups
+from . import backtest, candles, data, holdings, indicators, market, plan, risk, setups, strength
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -31,11 +31,10 @@ def exposure(portfolio: dict, last_close: dict) -> float:
 
 
 def rank_key(c: dict) -> tuple:
-    """순위: 리스크 통과 > 하락 캔들 경고 없음 > 검증된 상승 캔들 > 종목 백테스트 양수 > 평균 수익."""
+    """순위: 리스크 통과 > 종합 점수(국면별 셋업 성적·상대강도·추세 템플릿·종목 백테스트·캔들) > 종목 평균 수익."""
     bt = c["backtest_ticker"]
     passed = c["risk"]["verdict"].startswith("통과")
-    return (passed, not c.get("candle_warning"), bool(c.get("candle_bonus")),
-            bt.get("trades", 0) >= 5 and bt.get("avg_ret_pct", -99) > 0, bt.get("avg_ret_pct", -99))
+    return (passed, c.get("score", {}).get("total", 0), bt.get("avg_ret_pct", -99))
 
 
 def main() -> int:
@@ -46,12 +45,15 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     failures = {}
 
-    # 마켓부(숫자): 시장 국면
+    # 마켓부(숫자): 시장 국면. 지수도 3년치를 받아 백테스트 거래마다 '그날의 국면'을 붙입니다.
+    kospi_df, regimes = None, None
     try:
-        mkt = market.regime(data.kospi())
+        kospi_df = data.kospi(cfg["lookback_days"])
+        mkt = market.regime(kospi_df)
+        regimes = market.regime_series(kospi_df)
     except data.DataUnavailable as e:
         mkt = {"regime": "판정불가", "stance": "자료 없음 — 보수적으로", "shock": True}
-        failures["kospi"] = f"{e} → 시장 급변으로 간주해 신규 매수를 차단합니다."
+        failures["kospi"] = f"{e} → 시장 급변으로 간주해 신규 매수를 차단합니다. 상대강도는 코스피 대비가 아닌 절대 수익률로 계산합니다."
 
     # 스크리닝부: 대상 종목
     top_cfg = cfg.get("market_cap_top") or {}
@@ -88,6 +90,14 @@ def main() -> int:
         ticker_trades[t] = backtest.run(df, sl, tp, hold)
         all_trades += ticker_trades[t]
     pooled = backtest.by_setup(all_trades, rcfg["risk_per_trade_pct"])
+    pooled_regime = backtest.by_setup_regime(all_trades, regimes, rcfg["risk_per_trade_pct"])
+
+    # 상대강도(RS 등급)와 추세 템플릿: 코스피 대비 얼마나 강한가, 추세가 살아 있는가
+    rs = strength.rs_ratings({t: df["종가"] for t, df in frames.items()},
+                             kospi_df["종가"] if kospi_df is not None else None)
+    templates = {t: strength.trend_template(df, rs.get(t, {}).get("rs_rating")) for t, df in frames.items()}
+    for t in snaps:
+        snaps[t].update({**rs.get(t, {}), "trend_template": f"{templates[t]['passed']}/{templates[t]['total']}"})
 
     # 캔들 백테스트: 상승 반전 캔들이 우리 종목에서 실제로 통했나? 통한 것만 '검증된 캔들'
     candle_trades = []
@@ -123,15 +133,21 @@ def main() -> int:
                                     "backtest_all": candle_stats.get(x["pattern"], {"trades": 0})})
         atr_pct = float(last["atr"] / last["close"] * 100)
         for s in setups.detect(last):
-            p = plan.make_plan(float(last["close"]), s, sl, tp)
+            p = plan.make_plan(float(last["close"]), s, sl, tp, float(last["atr"]))
             g = risk.gate(p, atr_pct, mkt, rcfg, held)
             mine = [x for x in ticker_trades[t] if x["setup"] == s["setup"]]
             bonus, warning = candle_flags(t)
+            reg_stats = pooled_regime.get(s["setup"], {}).get(mkt["regime"])
+            ticker_stats = backtest.stats(mine, rcfg["risk_per_trade_pct"])
             candidates.append({
                 "ticker": t, "name": snaps[t]["name"], "plan": p, "risk": g, "atr_pct": round(atr_pct, 2),
                 "candles": recent_candles[t], "candle_bonus": bonus, "candle_warning": warning,
-                "backtest_ticker": backtest.stats(mine, rcfg["risk_per_trade_pct"]),
+                "backtest_ticker": ticker_stats,
                 "backtest_all": pooled.get(s["setup"], {"trades": 0}),
+                "backtest_regime": {"regime": mkt["regime"], **(reg_stats or {"trades": 0})},
+                "rs": rs.get(t), "trend_template": templates[t],
+                "score": strength.score(reg_stats, pooled.get(s["setup"]), rs.get(t), templates[t],
+                                        ticker_stats, bonus, warning),
             })
     candidates.sort(key=rank_key, reverse=True)
     # 한 종목에 셋업이 여러 개 성립하면 가장 좋은 셋업 하나만 회의에 올립니다.
@@ -151,6 +167,11 @@ def main() -> int:
             "", "## 리스크관리부 5기준", "```json", json.dumps(c["risk"], ensure_ascii=False, indent=2), "```",
             "", "## 백테스트 (이 종목·이 셋업, 최근 3년)", "```json", json.dumps(c["backtest_ticker"], ensure_ascii=False, indent=2), "```",
             "", "## 백테스트 (전 종목 합산·이 셋업)", "```json", json.dumps(c["backtest_all"], ensure_ascii=False, indent=2), "```",
+            "", f"## 백테스트 (전 종목·이 셋업·지금과 같은 국면: {c['backtest_regime']['regime']})", "```json",
+            json.dumps(c["backtest_regime"], ensure_ascii=False, indent=2), "```",
+            "", "## 강도 점수 (상대강도 · 추세 템플릿 · 종합 점수표)", "```json",
+            json.dumps({"상대강도": c["rs"], "추세_템플릿": c["trend_template"], "종합_점수": c["score"]},
+                       ensure_ascii=False, indent=2), "```",
             "", "## 캔들 신호 (최근 3거래일, 최신 먼저)", "```json",
             json.dumps({"recent": c["candles"], "검증된_상승캔들_가점": c["candle_bonus"], "하락캔들_경고": c["candle_warning"]},
                        ensure_ascii=False, indent=2), "```",
@@ -170,6 +191,9 @@ def main() -> int:
         prices = {t: round(float(frames[t]["종가"].iloc[-1])) for t in pf}
         hres = holdings.review(pf, prices, rcfg, trends, tp)
         text = holdings.render(hres, f"{snaps[next(iter(pf))]['date']} 종가")
+        text += "\n\n### 보유 종목 강도 (코스피 대비)\n" + "\n".join(
+            f"- {pf[t].get('name', t)}: 상대강도 {rs.get(t, {}).get('rs_rating', '-')}/99 · 최근 20일 코스피 대비 "
+            f"{rs.get(t, {}).get('rs_20d', '-')}%p · 추세 템플릿 {templates[t]['passed']}/{templates[t]['total']}" for t in pf)
         notes = [f"- 캔들 {pf[t].get('name', t)}: " + ", ".join(f"{x['date']} {x['pattern']}({x['kind']})" for x in recent_candles[t])
                  for t in pf if recent_candles[t]]
         if notes:
@@ -182,7 +206,9 @@ def main() -> int:
     (out / "plans.json").write_text(json.dumps(plans, ensure_ascii=False, indent=2), encoding="utf-8")
     summary = {
         "date": data.today_kst().isoformat(), "market": mkt, "risk_rules": rcfg,
-        "picks": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"]} for c in picks],
+        "picks": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"],
+                   "score": c["score"]["total"], "rs_rating": (c["rs"] or {}).get("rs_rating"),
+                   "trend_template": f"{c['trend_template']['passed']}/{c['trend_template']['total']}"} for c in picks],
         "other_candidates": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"], "verdict": c["risk"]["verdict"]} for c in candidates if c not in picks],
         # 오늘의 원칙 추천: 리스크 통과 후보 중 1순위 (하루 신규 매수 max_daily_new_buys 건)
         "recommend": [{"ticker": c["ticker"], "name": c["name"], "setup": c["plan"]["setup"]}
@@ -190,6 +216,7 @@ def main() -> int:
         # 대기 목록: 신호 가격까지 가까운 순
         "waiting": sorted(waiting, key=lambda w: abs(w["gap_pct"]))[:5],
         "backtest_by_setup": pooled,
+        "backtest_by_setup_regime": pooled_regime,
         "candle_backtest": candle_stats, "validated_candles": sorted(validated),
         "candles_today": {t: rc for t, rc in recent_candles.items() if rc and rc[0]["date"] == snaps[t]["date"]}, "universe": snaps, "failures": failures,
     }

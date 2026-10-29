@@ -1,6 +1,6 @@
 # 나의 AI 증권사
 
-- **숫자는 코드가, 해석은 AI가.** 스크리닝·셋업(`aisec/setups.py`)·운용 계획(`plan.py`)·리스크 5기준(`risk.py`)·백테스트(`backtest.py`)·채점(`review.py`)은 파이썬. 마켓부·분석부·뉴스공시부·반대편부는 `.claude/agents/`. 회의 진행은 `.claude/skills/morning-brief`.
+- **숫자는 코드가, 해석은 AI가.** 스크리닝·셋업(`aisec/setups.py`)·강도 점수(`aisec/strength.py`: 상대강도·추세 템플릿·종합 점수)·운용 계획(`plan.py`)·리스크 5기준(`risk.py`)·백테스트(`backtest.py`)·채점(`review.py`)은 파이썬. 마켓부·분석부·뉴스공시부·반대편부는 `.claude/agents/`. 회의 진행은 `.claude/skills/morning-brief`.
 - 원칙: 자료에 없는 숫자를 만들지 않는다. 데이터가 없으면 '휴업'한다.
 - 리스크관리부의 '차단'은 AI 의견으로 뒤집지 않는다.
 - 셋업 판별은 그날까지의 데이터만 쓴다(미래 데이터 금지). 백테스트와 실전이 같은 함수를 쓴다.

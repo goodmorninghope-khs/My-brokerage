@@ -98,6 +98,25 @@ def by_setup(trades: list[dict], risk_pct: float = 1.0) -> dict:
             for name in sorted({t["setup"] for t in trades})}
 
 
+def by_setup_regime(trades: list[dict], regimes: "pd.Series | None", risk_pct: float = 1.0) -> dict:
+    """셋업 × 시장 국면별 성적. 국면은 신호가 뜬 날(진입 전날)의 코스피 국면 — 그날까지의 데이터로만 판정."""
+    if regimes is None or regimes.empty:
+        return {}
+    labels = regimes.dropna()
+    out = {}
+    for name in sorted({t["setup"] for t in trades}):
+        rows = {}
+        for t in trades:
+            if t["setup"] != name:
+                continue
+            pos = labels.index.searchsorted(t["date"], side="right") - 1
+            if pos < 0:
+                continue
+            rows.setdefault(labels.iloc[pos], []).append(t)
+        out[name] = {rg: stats(ts, risk_pct) for rg, ts in sorted(rows.items())}
+    return out
+
+
 def run_candles(df: pd.DataFrame, stop_loss_pct: float, take_profit: list, max_hold: int = 20) -> list[dict]:
     """상승 반전 캔들이 나온 다음 날 시가에 샀다면? 손절은 신호 캔들 저가와 -N% 중 가까운 쪽."""
     from .candles import BULLISH, patterns

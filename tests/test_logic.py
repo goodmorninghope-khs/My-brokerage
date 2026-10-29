@@ -1,7 +1,9 @@
 """계산 로직 단위 테스트. 아래 숫자는 모두 테스트용 합성 데이터이며 실제 시세가 아닙니다."""
+import sys
+
 import pandas as pd
 
-from aisec import backtest, indicators, market, plan, risk, setups
+from aisec import backtest, indicators, market, plan, risk, setups, strength
 from aisec.cli import build_universe
 from aisec.data import is_preferred
 
@@ -227,3 +229,96 @@ def test_risk_gate_blocks_during_pause():
     assert g["verdict"].startswith("차단") and g["checks"][-1]["name"] == "06 휴식"
     g = risk.gate(p, atr_pct=2, market={"shock": False}, risk={**RISK, "pause_until": "2000-01-01"}, exposure=0)
     assert g["verdict"].startswith("통과")
+
+
+def test_regime_series_matches_today_regime_and_uses_past_only():
+    up = _frame([100 + i for i in range(80)])
+    ser = market.regime_series(up)
+    assert ser.iloc[-1] == market.regime(up)["regime"] == "상승장"
+    assert ser.iloc[:59].isna().all()  # 60일선이 생기기 전에는 판정하지 않음
+    # 뒤에 급락을 붙여도 앞날의 판정은 바뀌지 않음(미래 데이터 금지)
+    longer = _frame([100 + i for i in range(80)] + [50] * 30)
+    assert market.regime_series(longer).iloc[:80].fillna("-").equals(ser.fillna("-"))
+
+
+def test_backtest_by_regime_tags_trades_with_signal_day_regime():
+    idx = pd.date_range("2024-01-01", periods=4, freq="B")
+    regimes = pd.Series(["상승장", "상승장", "하락장", "하락장"], index=idx)
+    trades = [{"setup": "돌파", "date": idx[1], "ret_pct": 10, "r": 2},
+              {"setup": "돌파", "date": idx[3], "ret_pct": -5, "r": -1}]
+    out = backtest.by_setup_regime(trades, regimes)
+    assert out["돌파"]["상승장"]["trades"] == 1 and out["돌파"]["하락장"]["win_rate_pct"] == 0.0
+    assert backtest.by_setup_regime(trades, None) == {}
+
+
+def test_rs_rating_ranks_stronger_stock_higher_vs_index():
+    n = 300
+    idx_close = pd.Series([100 * 1.001 ** i for i in range(n)])
+    closes = {"강": pd.Series([100 * 1.003 ** i for i in range(n)]),
+              "보통": pd.Series([100 * 1.001 ** i for i in range(n)]),
+              "약": pd.Series([100 * 0.999 ** i for i in range(n)])}
+    rs = strength.rs_ratings(closes, idx_close)
+    assert rs["강"]["rs_rating"] == 99 and rs["약"]["rs_rating"] == 1
+    assert rs["강"]["rs_raw"] > 0 > rs["약"]["rs_raw"] and rs["강"]["rs_20d"] > 0
+
+
+def test_trend_template_full_marks_in_steady_uptrend():
+    tt = strength.trend_template(_frame([100 * 1.004 ** i for i in range(300)]), rs_rating=90)
+    assert tt["passed"] == tt["total"] == 7
+    down = strength.trend_template(_frame([100 * 0.996 ** i for i in range(300)]), rs_rating=10)
+    assert down["passed"] <= 1
+
+
+def test_score_prefers_regime_tested_setup_and_penalizes_warning():
+    good = {"trades": 30, "avg_ret_pct": 1.0, "reliable": True}
+    bad = {"trades": 30, "avg_ret_pct": -0.5, "reliable": True}
+    tt = {"passed": 7, "total": 7}
+    rs = {"rs_rating": 99}
+    a = strength.score(good, good, rs, tt, None, False, False)
+    b = strength.score(bad, good, rs, tt, None, False, False)
+    c = strength.score(good, good, rs, tt, None, False, True)
+    assert a["total"] == 75 and b["total"] == 45 and c["total"] == 55
+    assert strength.score(None, None, None, None, None, False, True)["total"] == 0  # 0점 아래로 내려가지 않음
+
+
+def test_plan_reports_stop_as_multiple_of_atr():
+    p = plan.make_plan(10000, {"setup": "눌림목", "stop": 9000, "why": "x"}, 5, TP, atr=400)
+    assert p["stop"] == 9500 and p["stop_atr_multiple"] == 1.25
+    assert plan.make_plan(10000, {"setup": "눌림목", "stop": 9000, "why": "x"}, 5, TP)["stop_atr_multiple"] is None
+
+
+def test_cli_end_to_end_with_synthetic_data(tmp_path, monkeypatch):
+    """네트워크 없이 아침 계산 전체(스크리닝→점수→리스크→결재 자료)가 끝까지 도는지 확인. 시세는 합성 데이터."""
+    import json
+    from datetime import date
+
+    import yaml
+
+    from aisec import cli, data
+
+    cfg = yaml.safe_load(open(cli.ROOT / "config.yaml", encoding="utf-8"))
+    cfg.update({"watchlist": {"000001": "상승주", "000002": "하락주", "000003": "보유주"},
+                "market_cap_top": {"count": 0}, "lookback_days": 600,
+                "portfolio": {"000003": {"name": "보유주", "shares": 10, "avg_price": 100}}})
+    cfg["risk"]["pause_until"] = None
+    (tmp_path / "config.yaml").write_text(yaml.safe_dump(cfg, allow_unicode=True), encoding="utf-8")
+    monkeypatch.setattr(cli, "ROOT", tmp_path)
+    frames = {"000001": _frame([100 * 1.003 ** i for i in range(400)]),
+              "000002": _frame([100 * 0.998 ** i for i in range(400)]),
+              "000003": _frame([100 + (i % 30) for i in range(400)])}
+    monkeypatch.setattr(data, "ohlcv", lambda t, n: frames[t])
+    monkeypatch.setattr(data, "kospi", lambda n=200: _frame([2500 * 1.001 ** i for i in range(400)]))
+    monkeypatch.setattr(data, "foreign_net_5d", lambda t: None)
+    monkeypatch.setattr(data, "fundamental", lambda t: None)
+    monkeypatch.setattr(data, "today_kst", lambda: date(2025, 7, 1))
+    monkeypatch.setattr(sys, "argv", ["cli"])
+
+    assert cli.main() == 0
+    out = tmp_path / "data" / "2025-07-01"
+    screen = json.loads((out / "screen.json").read_text(encoding="utf-8"))
+    u = screen["universe"]
+    assert u["000001"]["rs_rating"] > u["000002"]["rs_rating"]
+    assert "backtest_by_setup_regime" in screen
+    assert "상대강도" in (out / "holdings.md").read_text(encoding="utf-8")
+    assert screen["picks"] and "score" in screen["picks"][0]
+    assert "강도 점수" in (out / f"dossier_{screen['picks'][0]['ticker']}.md").read_text(encoding="utf-8")
