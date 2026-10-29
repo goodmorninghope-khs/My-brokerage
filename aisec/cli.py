@@ -132,6 +132,8 @@ def main() -> int:
                                     "condition": f"{x['meaning']}. 다음 날 이 고가를 넘으면 신호 확인",
                                     "backtest_all": candle_stats.get(x["pattern"], {"trades": 0})})
         atr_pct = float(last["atr"] / last["close"] * 100)
+        if t in (cfg.get("portfolio") or {}):
+            continue  # 이미 보유한 종목은 신규 매수 후보에서 뺍니다(보유 점검에서 따로 봅니다). 추가 매수로 비중이 넘치는 것을 막습니다.
         for s in setups.detect(last):
             p = plan.make_plan(float(last["close"]), s, sl, tp, float(last["atr"]))
             g = risk.gate(p, atr_pct, mkt, rcfg, held)

@@ -321,4 +321,5 @@ def test_cli_end_to_end_with_synthetic_data(tmp_path, monkeypatch):
     assert "backtest_by_setup_regime" in screen
     assert "상대강도" in (out / "holdings.md").read_text(encoding="utf-8")
     assert screen["picks"] and "score" in screen["picks"][0]
+    assert all(c["ticker"] != "000003" for c in screen["picks"] + screen["other_candidates"])  # 보유 종목은 후보에서 제외
     assert "강도 점수" in (out / f"dossier_{screen['picks'][0]['ticker']}.md").read_text(encoding="utf-8")
