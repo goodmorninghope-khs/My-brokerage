@@ -1,0 +1,152 @@
+[
+  {
+    "ticker": "138040",
+    "name": "메리츠금융지주",
+    "verdict": "통과 → 승인 요청",
+    "shares": 15,
+    "setup": "눌림목",
+    "why": "상승 추세 중 20일선까지 밀렸다가 지지받았습니다",
+    "entry": 129900,
+    "entry_zone": [
+      129250,
+      130549
+    ],
+    "stop": 123405,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        142890,
+        0.5
+      ],
+      [
+        149385,
+        0.5
+      ]
+    ],
+    "target": 142890,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 60일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.36
+  },
+  {
+    "ticker": "033780",
+    "name": "KT&G",
+    "verdict": "통과 → 승인 요청",
+    "shares": 10,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 193200,
+    "entry_zone": [
+      192234,
+      194166
+    ],
+    "stop": 183540,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        212520,
+        0.5
+      ],
+      [
+        222180,
+        0.5
+      ]
+    ],
+    "target": 212520,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.81
+  },
+  {
+    "ticker": "000660",
+    "name": "SK하이닉스",
+    "verdict": "차단 → 매매 보류",
+    "shares": 1,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 1480000,
+    "entry_zone": [
+      1472600,
+      1487400
+    ],
+    "stop": 1406000,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        1628000,
+        0.5
+      ],
+      [
+        1702000,
+        0.5
+      ]
+    ],
+    "target": 1628000,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 0.65
+  },
+  {
+    "ticker": "402340",
+    "name": "SK스퀘어",
+    "verdict": "차단 → 매매 보류",
+    "shares": 2,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 959000,
+    "entry_zone": [
+      954205,
+      963795
+    ],
+    "stop": 911050,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        1054900,
+        0.5
+      ],
+      [
+        1102850,
+        0.5
+      ]
+    ],
+    "target": 1054900,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 0.64
+  },
+  {
+    "ticker": "034730",
+    "name": "SK",
+    "verdict": "차단 → 매매 보류",
+    "shares": 3,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 523000,
+    "entry_zone": [
+      520385,
+      525615
+    ],
+    "stop": 496850,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        575300,
+        0.5
+      ],
+      [
+        601450,
+        0.5
+      ]
+    ],
+    "target": 575300,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 0.65
+  }
+]
