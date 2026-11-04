@@ -1,0 +1,422 @@
+[
+  {
+    "ticker": "138040",
+    "name": "메리츠금융지주",
+    "verdict": "통과 → 승인 요청",
+    "shares": 15,
+    "setup": "눌림목",
+    "why": "상승 추세 중 20일선까지 밀렸다가 지지받았습니다",
+    "entry": 132800,
+    "entry_zone": [
+      132136,
+      133464
+    ],
+    "stop": 126160,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        146080,
+        0.5
+      ],
+      [
+        152720,
+        0.5
+      ]
+    ],
+    "target": 146080,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 60일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.36
+  },
+  {
+    "ticker": "138040",
+    "name": "메리츠금융지주",
+    "verdict": "통과 → 승인 요청",
+    "shares": 15,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 132800,
+    "entry_zone": [
+      132136,
+      133464
+    ],
+    "stop": 126160,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        146080,
+        0.5
+      ],
+      [
+        152720,
+        0.5
+      ]
+    ],
+    "target": 146080,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.36
+  },
+  {
+    "ticker": "068270",
+    "name": "셀트리온",
+    "verdict": "통과 → 승인 요청",
+    "shares": 9,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 202000,
+    "entry_zone": [
+      200990,
+      203010
+    ],
+    "stop": 191900,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        222200,
+        0.5
+      ],
+      [
+        232300,
+        0.5
+      ]
+    ],
+    "target": 222200,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.33
+  },
+  {
+    "ticker": "068270",
+    "name": "셀트리온",
+    "verdict": "통과 → 승인 요청",
+    "shares": 9,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 202000,
+    "entry_zone": [
+      200990,
+      203010
+    ],
+    "stop": 191900,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        222200,
+        0.5
+      ],
+      [
+        232300,
+        0.5
+      ]
+    ],
+    "target": 222200,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.33
+  },
+  {
+    "ticker": "033780",
+    "name": "KT&G",
+    "verdict": "통과 → 승인 요청",
+    "shares": 10,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 194100,
+    "entry_zone": [
+      193130,
+      195070
+    ],
+    "stop": 184395,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        213510,
+        0.5
+      ],
+      [
+        223215,
+        0.5
+      ]
+    ],
+    "target": 213510,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.89
+  },
+  {
+    "ticker": "033780",
+    "name": "KT&G",
+    "verdict": "통과 → 승인 요청",
+    "shares": 10,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 194100,
+    "entry_zone": [
+      193130,
+      195070
+    ],
+    "stop": 184395,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        213510,
+        0.5
+      ],
+      [
+        223215,
+        0.5
+      ]
+    ],
+    "target": 213510,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.89
+  },
+  {
+    "ticker": "017670",
+    "name": "SK텔레콤",
+    "verdict": "통과 → 승인 요청",
+    "shares": 25,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 78200,
+    "entry_zone": [
+      77809,
+      78591
+    ],
+    "stop": 74290,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        86020,
+        0.5
+      ],
+      [
+        89930,
+        0.5
+      ]
+    ],
+    "target": 86020,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.19
+  },
+  {
+    "ticker": "015760",
+    "name": "한국전력",
+    "verdict": "통과 → 승인 요청",
+    "shares": 65,
+    "setup": "돌파",
+    "why": "거래량을 동반해 20일 고점을 넘었습니다",
+    "entry": 30600,
+    "entry_zone": [
+      30447,
+      30753
+    ],
+    "stop": 29982,
+    "stop_pct": -2.02,
+    "targets": [
+      [
+        33660,
+        0.5
+      ],
+      [
+        35190,
+        0.5
+      ]
+    ],
+    "target": 33660,
+    "target_pct": 10.0,
+    "rr": 4.95,
+    "invalidation": "종가가 돌파한 저항선 아래로 다시 내려오면 무효",
+    "stop_atr_multiple": 0.54
+  },
+  {
+    "ticker": "010140",
+    "name": "삼성중공업",
+    "verdict": "통과 → 승인 요청",
+    "shares": 112,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 17700,
+    "entry_zone": [
+      17612,
+      17788
+    ],
+    "stop": 16815,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        19470,
+        0.5
+      ],
+      [
+        20355,
+        0.5
+      ]
+    ],
+    "target": 19470,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.0
+  },
+  {
+    "ticker": "006400",
+    "name": "삼성SDI",
+    "verdict": "차단 → 매매 보류",
+    "shares": 3,
+    "setup": "눌림목",
+    "why": "상승 추세 중 20일선까지 밀렸다가 지지받았습니다",
+    "entry": 550000,
+    "entry_zone": [
+      547250,
+      552750
+    ],
+    "stop": 522500,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        605000,
+        0.5
+      ],
+      [
+        632500,
+        0.5
+      ]
+    ],
+    "target": 605000,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 60일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 0.62
+  },
+  {
+    "ticker": "028050",
+    "name": "삼성E&A",
+    "verdict": "차단 → 매매 보류",
+    "shares": 29,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 66900,
+    "entry_zone": [
+      66566,
+      67234
+    ],
+    "stop": 63555,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        73590,
+        0.5
+      ],
+      [
+        76935,
+        0.5
+      ]
+    ],
+    "target": 73590,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 0.83
+  },
+  {
+    "ticker": "006400",
+    "name": "삼성SDI",
+    "verdict": "차단 → 매매 보류",
+    "shares": 3,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 550000,
+    "entry_zone": [
+      547250,
+      552750
+    ],
+    "stop": 522500,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        605000,
+        0.5
+      ],
+      [
+        632500,
+        0.5
+      ]
+    ],
+    "target": 605000,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 0.62
+  },
+  {
+    "ticker": "207940",
+    "name": "삼성바이오로직스",
+    "verdict": "차단 → 매매 보류",
+    "shares": 1,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 1497000,
+    "entry_zone": [
+      1489515,
+      1504485
+    ],
+    "stop": 1422150,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        1646700,
+        0.5
+      ],
+      [
+        1721550,
+        0.5
+      ]
+    ],
+    "target": 1646700,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 0.89
+  },
+  {
+    "ticker": "298040",
+    "name": "효성중공업",
+    "verdict": "차단 → 매매 보류",
+    "shares": 0,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 2057000,
+    "entry_zone": [
+      2046715,
+      2067285
+    ],
+    "stop": 1954150,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        2262700,
+        0.5
+      ],
+      [
+        2365550,
+        0.5
+      ]
+    ],
+    "target": 2262700,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 0.68
+  }
+]
