@@ -1,0 +1,392 @@
+[
+  {
+    "ticker": "180640",
+    "name": "한진칼",
+    "verdict": "차단 → 매매 보류",
+    "shares": 10,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 182700,
+    "entry_zone": [
+      181786,
+      183613
+    ],
+    "stop": 173565,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        200970,
+        0.5
+      ],
+      [
+        210105,
+        0.5
+      ]
+    ],
+    "target": 200970,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 0.79
+  },
+  {
+    "ticker": "033780",
+    "name": "KT&G",
+    "verdict": "차단 → 매매 보류",
+    "shares": 10,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 196900,
+    "entry_zone": [
+      195916,
+      197884
+    ],
+    "stop": 187055,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        216590,
+        0.5
+      ],
+      [
+        226435,
+        0.5
+      ]
+    ],
+    "target": 216590,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.98
+  },
+  {
+    "ticker": "033780",
+    "name": "KT&G",
+    "verdict": "차단 → 매매 보류",
+    "shares": 10,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 196900,
+    "entry_zone": [
+      195916,
+      197884
+    ],
+    "stop": 187055,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        216590,
+        0.5
+      ],
+      [
+        226435,
+        0.5
+      ]
+    ],
+    "target": 216590,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.98
+  },
+  {
+    "ticker": "068270",
+    "name": "셀트리온",
+    "verdict": "차단 → 매매 보류",
+    "shares": 9,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 215000,
+    "entry_zone": [
+      213925,
+      216075
+    ],
+    "stop": 204250,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        236500,
+        0.5
+      ],
+      [
+        247250,
+        0.5
+      ]
+    ],
+    "target": 236500,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.42
+  },
+  {
+    "ticker": "068270",
+    "name": "셀트리온",
+    "verdict": "차단 → 매매 보류",
+    "shares": 9,
+    "setup": "돌파",
+    "why": "거래량을 동반해 20일 고점을 넘었습니다",
+    "entry": 215000,
+    "entry_zone": [
+      213925,
+      216075
+    ],
+    "stop": 204250,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        236500,
+        0.5
+      ],
+      [
+        247250,
+        0.5
+      ]
+    ],
+    "target": 236500,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 돌파한 저항선 아래로 다시 내려오면 무효",
+    "stop_atr_multiple": 1.42
+  },
+  {
+    "ticker": "138040",
+    "name": "메리츠금융지주",
+    "verdict": "차단 → 매매 보류",
+    "shares": 14,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 135000,
+    "entry_zone": [
+      134325,
+      135675
+    ],
+    "stop": 128250,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        148500,
+        0.5
+      ],
+      [
+        155250,
+        0.5
+      ]
+    ],
+    "target": 148500,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.39
+  },
+  {
+    "ticker": "086790",
+    "name": "하나금융지주",
+    "verdict": "차단 → 매매 보류",
+    "shares": 16,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 122000,
+    "entry_zone": [
+      121390,
+      122610
+    ],
+    "stop": 115900,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        134200,
+        0.5
+      ],
+      [
+        140300,
+        0.5
+      ]
+    ],
+    "target": 134200,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.22
+  },
+  {
+    "ticker": "207940",
+    "name": "삼성바이오로직스",
+    "verdict": "차단 → 매매 보류",
+    "shares": 1,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 1519000,
+    "entry_zone": [
+      1511405,
+      1526595
+    ],
+    "stop": 1443050,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        1670900,
+        0.5
+      ],
+      [
+        1746850,
+        0.5
+      ]
+    ],
+    "target": 1670900,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 0.94
+  },
+  {
+    "ticker": "316140",
+    "name": "우리금융지주",
+    "verdict": "차단 → 매매 보류",
+    "shares": 62,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 32150,
+    "entry_zone": [
+      31989,
+      32311
+    ],
+    "stop": 30542,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        35365,
+        0.5
+      ],
+      [
+        36972,
+        0.5
+      ]
+    ],
+    "target": 35365,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.4
+  },
+  {
+    "ticker": "105560",
+    "name": "KB금융",
+    "verdict": "차단 → 매매 보류",
+    "shares": 12,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 158200,
+    "entry_zone": [
+      157409,
+      158991
+    ],
+    "stop": 150290,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        174020,
+        0.5
+      ],
+      [
+        181930,
+        0.5
+      ]
+    ],
+    "target": 174020,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.39
+  },
+  {
+    "ticker": "010130",
+    "name": "고려아연",
+    "verdict": "차단 → 매매 보류",
+    "shares": 2,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 987000,
+    "entry_zone": [
+      982065,
+      991935
+    ],
+    "stop": 937650,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        1085700,
+        0.5
+      ],
+      [
+        1135050,
+        0.5
+      ]
+    ],
+    "target": 1085700,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.01
+  },
+  {
+    "ticker": "035720",
+    "name": "카카오",
+    "verdict": "차단 → 매매 보류",
+    "shares": 61,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 32400,
+    "entry_zone": [
+      32238,
+      32562
+    ],
+    "stop": 30780,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        35640,
+        0.5
+      ],
+      [
+        37260,
+        0.5
+      ]
+    ],
+    "target": 35640,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.44
+  },
+  {
+    "ticker": "015760",
+    "name": "한국전력",
+    "verdict": "차단 → 매매 보류",
+    "shares": 64,
+    "setup": "돌파",
+    "why": "거래량을 동반해 20일 고점을 넘었습니다",
+    "entry": 31200,
+    "entry_zone": [
+      31044,
+      31356
+    ],
+    "stop": 30214,
+    "stop_pct": -3.16,
+    "targets": [
+      [
+        34320,
+        0.5
+      ],
+      [
+        35880,
+        0.5
+      ]
+    ],
+    "target": 34320,
+    "target_pct": 10.0,
+    "rr": 3.16,
+    "invalidation": "종가가 돌파한 저항선 아래로 다시 내려오면 무효",
+    "stop_atr_multiple": 0.84
+  }
+]
