@@ -8,6 +8,9 @@
 2. 주식 비중이 총노출 한도를 넘으면 → 초과분만큼 축소 제안
    축소 순서: 추세 이탈(20일선 < 60일선이고 종가 < 60일선) 종목 먼저, 그다음 손절선에 가까운 종목 먼저
 3. 나머지 → 보유 유지, 손절선·목표가 안내
+* 경고(제안은 바꾸지 않고 눈에 띄게만): 장중 저가가 손절선을 건드린 날, 손절선 아래 마감이 이어진 날 수,
+  손실이 한 번 손절 한도(자산의 risk_per_trade_pct%)를 넘었는지. 백테스트는 '저가가 손절선 이하'면 손절로 치므로
+  종가 기준 제안과 어긋나는 날을 숨기지 않습니다.
 * 한 종목 비중 한도(max_position_pct)는 보유 종목에 '유연'하게: 넘으면 경고와 참고 수량만 보여 주고 강제 축소하지 않습니다.
 
 수동 실행 (데이터 연결 전, 앱 화면 가격으로):
@@ -24,10 +27,31 @@ from .backtest import targets_for
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def bar_detail(df, stop: float) -> dict:
+    """보유 점검에 붙일 마지막 일봉·이평선·손절선 이탈 일수. df 는 그날까지의 일봉."""
+    c = df["종가"]
+    last = df.iloc[-1]
+    below = 0
+    for v in reversed(c.tolist()):  # 손절선 이하 마감이 며칠째 이어졌나
+        if v > stop:
+            break
+        below += 1
+    vol20 = df["거래량"].tail(21).iloc[:-1].mean()
+    return {
+        "date": df.index[-1].strftime("%Y-%m-%d"),
+        "open": round(float(last["시가"])), "high": round(float(last["고가"])), "low": round(float(last["저가"])),
+        "close": round(float(last["종가"])), "change_1d_pct": round((float(c.iloc[-1]) / float(c.iloc[-2]) - 1) * 100, 2),
+        "volume": int(last["거래량"]), "volume_ratio": round(float(last["거래량"]) / vol20, 2) if vol20 else None,
+        "ma20": round(float(c.rolling(20).mean().iloc[-1]), 1), "ma60": round(float(c.rolling(60).mean().iloc[-1]), 1),
+        "days_below_stop": below,
+    }
+
+
 def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None,
-           take_profit: list | None = None) -> dict:
+           take_profit: list | None = None, details: dict | None = None) -> dict:
     take_profit = take_profit or [[10, 0.5], [15, 0.5]]
     trends = trends or {}
+    details = details or {}
     capital, stop_pct = risk["capital"], risk["stop_loss_pct"]
     rows = []
     for t, h in portfolio.items():
@@ -38,7 +62,8 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
             "value": px * h["shares"], "pnl": (px - avg) * h["shares"], "pnl_pct": round((px / avg - 1) * 100, 2),
             "stop": stop, "to_stop_pct": round((stop / px - 1) * 100, 2),
             "targets": targets_for(avg, take_profit),
-            "trend_broken": trends.get(t), "sell": 0, "action": "보유 유지", "reasons": [],
+            "trend_broken": trends.get(t), "sell": 0, "action": "보유 유지", "reasons": [], "warnings": [],
+            "detail": details.get(t), "loss_pct_capital": round((px - avg) * h["shares"] / capital * 100, 2),
         })
 
     for r in rows:  # 1. 손절선
@@ -53,6 +78,16 @@ def review(portfolio: dict, prices: dict, risk: dict, trends: dict | None = None
             n = r["shares"] if portion >= 1 else max(1, math.floor(r["shares"] * portion))
             r.update(sell=n, action="전량 익절" if n == r["shares"] else f"{n}주 익절")
             r["reasons"].append(f"{len(reached)}차 익절가 {reached[-1][0]:,}원 도달")
+
+    for r in rows:  # 경고: 제안(action)은 바꾸지 않습니다
+        d, limit_pct = r["detail"], risk.get("risk_per_trade_pct", 1)
+        if d and d["low"] <= r["stop"] < r["price"]:
+            r["warnings"].append(f"장중 저가 {d['low']:,}원이 손절선 {r['stop']:,}원 아래였습니다(종가는 위). "
+                                 "감시 손절이 걸려 있었다면 체결됐을 자리이고, 백테스트는 이런 날을 손절로 칩니다")
+        if d and d["days_below_stop"] >= 2:
+            r["warnings"].append(f"손절선 아래 마감 {d['days_below_stop']}거래일째")
+        if r["loss_pct_capital"] <= -limit_pct:
+            r["warnings"].append(f"손실이 자산의 {abs(r['loss_pct_capital'])}% — 한 번 손절 한도 {limit_pct}% 초과")
 
     total = sum(r["value"] for r in rows)
     limit = capital * risk["max_total_exposure_pct"] / 100
@@ -101,6 +136,16 @@ def render(res: dict, as_of: str) -> str:
     lines.append("")
     for r in res["rows"]:
         lines.append(f"- {r['name']}: " + " / ".join(r["reasons"]))
+        for w in r.get("warnings", []):
+            lines.append(f"  - ⚠ {w}")
+        d = r.get("detail")
+        if d:
+            vol = f" · 거래량 평소의 {d['volume_ratio']}배" if d.get("volume_ratio") else ""
+            lines.append(f"  - {d['date']} 일봉: 시가 {d['open']:,} · 고가 {d['high']:,} · 저가 {d['low']:,} · 종가 {d['close']:,}"
+                         f"({d['change_1d_pct']:+}%){vol}")
+            lines.append(f"  - 이평선: 20일선 {d['ma20']:,}(종가가 {(d['close'] / d['ma20'] - 1) * 100:+.2f}%) · "
+                         f"60일선 {d['ma60']:,}(종가가 {(d['close'] / d['ma60'] - 1) * 100:+.2f}%) · "
+                         f"손익은 자산의 {r['loss_pct_capital']:+}%")
     lines += ["", "- [ ] 제안대로   [ ] 일부만   [ ] 보류   ← 대표님 결재",
               "", "규칙이 낸 제안일 뿐 투자 권유가 아닙니다. 최종 판단은 결재자에게 있습니다."]
     return "\n".join(lines)

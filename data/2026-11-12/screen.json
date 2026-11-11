@@ -6,8 +6,102 @@
     "change_1d_pct": 2.6,
     "change_5d_pct": -5.43,
     "regime": "하락장",
-    "stance": "방어: 신규 매수 최소화, 반전 셋업만 소액",
-    "shock": false
+    "stance": "방어: 신규 매수 최소화, 국면 성적이 플러스인 셋업만 소액",
+    "shock": false,
+    "fit": {
+      "fit": [],
+      "thin": [
+        {
+          "setup": "눌림목",
+          "trades": 148,
+          "win_rate_pct": 38.5,
+          "avg_ret_pct": 0.02
+        }
+      ],
+      "avoid": [
+        {
+          "setup": "모멘텀",
+          "trades": 134,
+          "win_rate_pct": 29.9,
+          "avg_ret_pct": -1.05
+        },
+        {
+          "setup": "돌파",
+          "trades": 61,
+          "win_rate_pct": 21.3,
+          "avg_ret_pct": -1.15
+        },
+        {
+          "setup": "추세지속",
+          "trades": 31,
+          "win_rate_pct": 29.0,
+          "avg_ret_pct": -1.28
+        },
+        {
+          "setup": "반전",
+          "trades": 62,
+          "win_rate_pct": 27.4,
+          "avg_ret_pct": -1.48
+        }
+      ],
+      "unknown": []
+    },
+    "shock_outlook": [
+      {
+        "step": 1,
+        "base_date": "2026-11-05",
+        "floor_5d": 5006.9,
+        "low_1d": 5214.1,
+        "high_1d": 5536.6,
+        "lower": 5214.1,
+        "upper": 5536.6,
+        "possible": true,
+        "lower_pct": -3.0,
+        "upper_pct": 3.0
+      },
+      {
+        "step": 2,
+        "base_date": "2026-11-06",
+        "floor_5d": 4705.5
+      },
+      {
+        "step": 3,
+        "base_date": "2026-11-09",
+        "floor_5d": 4667.5
+      }
+    ],
+    "recent": [
+      {
+        "date": "2026-11-04",
+        "close": 5683.8,
+        "change_pct": 0.62
+      },
+      {
+        "date": "2026-11-05",
+        "close": 5383.8,
+        "change_pct": -5.28
+      },
+      {
+        "date": "2026-11-06",
+        "close": 5059.69,
+        "change_pct": -6.02
+      },
+      {
+        "date": "2026-11-09",
+        "close": 5018.85,
+        "change_pct": -0.81
+      },
+      {
+        "date": "2026-11-10",
+        "close": 5239.13,
+        "change_pct": 4.39
+      },
+      {
+        "date": "2026-11-11",
+        "close": 5375.36,
+        "change_pct": 2.6
+      }
+    ]
   },
   "risk_rules": {
     "capital": 10000000,

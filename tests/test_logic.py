@@ -3,7 +3,7 @@ import sys
 
 import pandas as pd
 
-from aisec import backtest, indicators, market, plan, risk, setups, strength
+from aisec import backtest, brief, holdings, indicators, market, plan, review, risk, setups, strength
 from aisec.cli import build_universe
 from aisec.data import is_preferred
 
@@ -323,3 +323,94 @@ def test_cli_end_to_end_with_synthetic_data(tmp_path, monkeypatch):
     assert screen["picks"] and "score" in screen["picks"][0]
     assert all(c["ticker"] != "000003" for c in screen["picks"] + screen["other_candidates"])  # 보유 종목은 후보에서 제외
     assert "강도 점수" in (out / f"dossier_{screen['picks'][0]['ticker']}.md").read_text(encoding="utf-8")
+    # 결재 문서 초안과 보유 종목 자료 묶음도 코드가 만든다
+    draft = (out / "brief_draft.md").read_text(encoding="utf-8")
+    assert "## 오늘 결재할 것" in draft and "[[" in draft and "급변 규칙" in draft
+    assert screen["market"]["shock_outlook"][0]["upper"] > screen["market"]["kospi"]
+    assert "보유 종목" in (out / "dossier_000003.md").read_text(encoding="utf-8")
+    (tmp_path / "draft.md").write_text(draft, encoding="utf-8")
+    assert brief.main(["check", str(tmp_path / "draft.md")]) == 1  # 안 채운 칸이 남으면 실패
+    (tmp_path / "done.md").write_text("# 다 채움", encoding="utf-8")
+    assert brief.main(["check", str(tmp_path / "done.md")]) == 0
+
+
+def test_shock_outlook_matches_shock_rule():
+    """급변 해제 구간은 regime()의 급변 판정과 같은 상수로 계산한다: 구간 안이면 꺼지고, 밖이면 켜진다."""
+    df = _frame([100.0] * 70)
+    o = market.shock_outlook(df)[0]
+    assert o["possible"] and (o["lower"], o["upper"]) == (97.0, 103.0)
+    inside = _frame([100.0] * 70 + [102.9])
+    outside = _frame([100.0] * 70 + [96.9])
+    assert market.regime(inside)["shock"] is False and market.regime(outside)["shock"] is True
+    # 5일 전보다 이미 많이 빠져 있으면 하루 구간과 겹치지 않는다 → 내일 해제 불가
+    crash = _frame([100.0] * 66 + [100, 100, 100, 100, 88])
+    c = market.shock_outlook(crash)[0]
+    assert c["possible"] is False and c["floor_5d"] == 93.0
+
+
+def test_fit_setups_sorts_by_regime_numbers():
+    st = {"눌림목": {"하락장": {"trades": 148, "win_rate_pct": 38.5, "avg_ret_pct": 0.02, "reliable": True}},
+          "모멘텀": {"하락장": {"trades": 134, "win_rate_pct": 29.9, "avg_ret_pct": -1.05, "reliable": True},
+                  "상승장": {"trades": 300, "win_rate_pct": 40.0, "avg_ret_pct": 1.09, "reliable": True}},
+          "반전": {"하락장": {"trades": 5, "win_rate_pct": 20.0, "avg_ret_pct": 3.0, "reliable": False}}}
+    f = market.fit_setups(st, "하락장")
+    assert f["fit"] == [] and [r["setup"] for r in f["thin"]] == ["눌림목"]
+    assert [r["setup"] for r in f["avoid"]] == ["모멘텀"] and [r["setup"] for r in f["unknown"]] == ["반전"]
+    assert [r["setup"] for r in market.fit_setups(st, "상승장")["fit"]] == ["모멘텀"]
+    assert "반전" not in market.STANCE["하락장"]  # 태세 문구가 특정 셋업을 못 박지 않는다
+
+
+def test_score_scales_with_regime_edge():
+    tt, rs = {"passed": 7, "total": 7}, {"rs_rating": 99}
+    thin = {"trades": 148, "avg_ret_pct": 0.02, "reliable": True}
+    half = {"trades": 148, "avg_ret_pct": 0.5, "reliable": True}
+    assert strength.score(thin, thin, rs, tt, None, False, False)["parts"]["국면별 셋업 성적"] == 1
+    assert strength.score(half, half, rs, tt, None, False, False)["parts"]["국면별 셋업 성적"] == 15
+
+
+def test_holdings_warns_when_low_touches_stop_but_keeps_rule_action():
+    pf = {"A": {"name": "가", "shares": 50, "avg_price": 22650}}
+    risk_cfg = {**RISK, "max_position_pct": 20, "max_total_exposure_pct": 70}
+    closes = [22000.0] * 70 + [21950.0]
+    df = _frame(closes)
+    df.iloc[-1, df.columns.get_loc("저가")] = 21450.0
+    d = holdings.bar_detail(df, 21518)
+    assert d["low"] == 21450 and d["days_below_stop"] == 0
+    res = holdings.review(pf, {"A": 21950}, risk_cfg, details={"A": d})
+    row = res["rows"][0]
+    assert row["action"] == "보유 유지" and any("장중 저가" in w for w in row["warnings"])  # 제안은 그대로, 경고만
+    # 손절선 아래 마감이 이어지고 손실이 한도를 넘으면 둘 다 경고
+    df2 = _frame([22000.0] * 70 + [20750.0, 20350.0, 20050.0])
+    d2 = holdings.bar_detail(df2, 21518)
+    res2 = holdings.review(pf, {"A": 20050}, risk_cfg, details={"A": d2})
+    w = res2["rows"][0]["warnings"]
+    assert d2["days_below_stop"] == 3 and res2["rows"][0]["action"] == "전량 매도"
+    assert any("3거래일째" in x for x in w) and any("한도 1% 초과" in x for x in w)
+    assert "⚠" in holdings.render(res2, "테스트")
+
+
+def test_excess_20d_history_turns_negative_when_stock_lags():
+    idx = _frame([100 * 1.01 ** i for i in range(60)])["종가"]
+    lag = _frame([100.0] * 60)["종가"]
+    h = strength.excess_20d_history(lag, idx, 3)
+    assert len(h) == 3 and all(x["rs_20d"] < 0 for x in h)
+
+
+def test_review_counts_repeated_signal_once_and_grades_from_brief_day():
+    rows = [{"day": d, "date": d, "ticker": "A", "name": "가", "setup": "눌림목", "verdict": "차단 → 매매 보류", "result": "손절", "ret_pct": -5.25}
+            for d in ("2026-10-12", "2026-10-13", "2026-10-14")]
+    rows.append({"day": "2026-10-16", "date": "2026-10-16", "ticker": "A", "name": "가", "setup": "눌림목", "verdict": "통과 → 승인 요청",
+                 "result": "진행중", "ret_pct": None})  # 10/15 에는 없다가 다시 뜬 신호는 새 표본
+    rows.append({"day": "2026-10-15", "date": "2026-10-15", "ticker": "B", "name": "나", "setup": "돌파", "verdict": "차단 → 매매 보류",
+                 "result": "1차 익절 후 손절", "ret_pct": 2.0})
+    uniq = review.first_signals(rows)
+    assert [(r["day"], r["ticker"]) for r in uniq] == [("2026-10-12", "A"), ("2026-10-16", "A"), ("2026-10-15", "B")]
+    s = review.summarize(uniq)
+    assert (s["total"], s["done"], s["take_profit"], s["stop"], s["open"]) == (3, 2, 1, 1, 1)
+    assert "독립 신호 3건" in review.render(rows)
+    # 진입일은 브리핑 날짜 그 자체: 첫 봉에서 손절가를 건드리면 손절
+    bars = _frame([100.0, 100.0])
+    bars.iloc[0, bars.columns.get_loc("저가")] = 94.0
+    g = review.grade({"entry": 100, "stop": 95, "targets": [[110, 0.5], [115, 0.5]]}, bars, 20)
+    assert g["result"] == "손절" and g["ret_pct"] == -5.25
+    assert review.grade({"entry": 100, "stop": 95, "target": 110}, bars.iloc[:0], 20)["result"] == "진행중"

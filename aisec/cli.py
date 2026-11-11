@@ -10,7 +10,7 @@ from pathlib import Path
 
 import yaml
 
-from . import backtest, candles, data, holdings, indicators, market, plan, risk, setups, strength
+from . import backtest, brief, candles, data, holdings, indicators, market, plan, risk, setups, strength
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -91,6 +91,13 @@ def main() -> int:
         all_trades += ticker_trades[t]
     pooled = backtest.by_setup(all_trades, rcfg["risk_per_trade_pct"])
     pooled_regime = backtest.by_setup_regime(all_trades, regimes, rcfg["risk_per_trade_pct"])
+    if kospi_df is not None:
+        # 마켓부가 손으로 계산하던 숫자를 코드로: 국면에 맞는/피할 셋업, 급변 규칙이 풀리는 종가 구간, 최근 지수 흐름
+        kc = kospi_df["종가"]
+        mkt["fit"] = market.fit_setups(pooled_regime, mkt["regime"])
+        mkt["shock_outlook"] = market.shock_outlook(kospi_df)
+        mkt["recent"] = [{"date": d.strftime("%Y-%m-%d"), "close": round(float(v), 2),
+                          "change_pct": round(float(ch), 2)} for (d, v), ch in zip(kc.tail(6).items(), kc.pct_change().tail(6) * 100)]
 
     # 상대강도(RS 등급)와 추세 템플릿: 코스피 대비 얼마나 강한가, 추세가 살아 있는가
     rs = strength.rs_ratings({t: df["종가"] for t, df in frames.items()},
@@ -161,6 +168,7 @@ def main() -> int:
 
     for c in picks:
         t = c["ticker"]
+        c["foreign_net_5d"], c["fundamental"] = data.foreign_net_5d(t), data.fundamental(t)
         recent = frames[t].tail(20)[["시가", "고가", "저가", "종가", "거래량"]]
         doc = [
             f"# 자료 묶음: {c['name']} ({t}) — 셋업 [{c['plan']['setup']}]",
@@ -178,29 +186,57 @@ def main() -> int:
             json.dumps({"recent": c["candles"], "검증된_상승캔들_가점": c["candle_bonus"], "하락캔들_경고": c["candle_warning"]},
                        ensure_ascii=False, indent=2), "```",
             "", "## 수급·펀더멘털 (KRX 로그인 없으면 null)", "```json",
-            json.dumps({"foreign_net_5d": data.foreign_net_5d(t), "fundamental": data.fundamental(t)}, ensure_ascii=False, indent=2),
+            json.dumps({"foreign_net_5d": c["foreign_net_5d"], "fundamental": c["fundamental"]}, ensure_ascii=False, indent=2),
             "```", "", "## 최근 20거래일 일봉", "```", recent.to_string(), "```",
         ]
         (out / f"dossier_{t}.md").write_text("\n".join(doc), encoding="utf-8")
 
     # 보유 종목 점검: 실제 종가와 추세(20일선<60일선, 종가<60일선)로 원칙 제안
     pf = cfg.get("portfolio") or {}
+    hres, holdings_text = None, None
     if pf and all(t in frames for t in pf):
-        trends = {}
+        trends, details = {}, {}
         for t in pf:
             last = setups.features(frames[t]).iloc[-1]
             trends[t] = bool(last["ma20"] < last["ma60"] and last["close"] < last["ma60"])
+            details[t] = holdings.bar_detail(frames[t], round(pf[t]["avg_price"] * (1 - sl / 100)))
         prices = {t: round(float(frames[t]["종가"].iloc[-1])) for t in pf}
-        hres = holdings.review(pf, prices, rcfg, trends, tp)
+        hres = holdings.review(pf, prices, rcfg, trends, tp, details)
         text = holdings.render(hres, f"{snaps[next(iter(pf))]['date']} 종가")
-        text += "\n\n### 보유 종목 강도 (코스피 대비)\n" + "\n".join(
-            f"- {pf[t].get('name', t)}: 상대강도 {rs.get(t, {}).get('rs_rating', '-')}/99 · 최근 20일 코스피 대비 "
-            f"{rs.get(t, {}).get('rs_20d', '-')}%p · 추세 템플릿 {templates[t]['passed']}/{templates[t]['total']}" for t in pf)
+        kclose = kospi_df["종가"] if kospi_df is not None else None
+        history = {t: strength.excess_20d_history(frames[t]["종가"], kclose) for t in pf}
+        strength_lines = []
+        for t in pf:
+            line = (f"- {pf[t].get('name', t)}: 상대강도 {rs.get(t, {}).get('rs_rating', '-')}/99 · 최근 20일 코스피 대비 "
+                    f"{rs.get(t, {}).get('rs_20d', '-')}%p · 추세 템플릿 {templates[t]['passed']}/{templates[t]['total']}")
+            failed = [k for k, v in templates[t]["checks"].items() if not v]
+            if failed:
+                line += f" (탈락: {', '.join(failed)})"
+            strength_lines.append(line)
+            if history[t]:
+                flow = " → ".join(f"{h['rs_20d']:+}" for h in history[t])
+                weak = " ⚠ 시장보다 약해짐(0 이하)" if history[t][-1]["rs_20d"] <= 0 else ""
+                strength_lines.append(f"  - 20일 코스피 대비 흐름(최근 {len(history[t])}거래일, %p): {flow}{weak}")
+        text += "\n\n### 보유 종목 강도 (코스피 대비)\n" + "\n".join(strength_lines)
         notes = [f"- 캔들 {pf[t].get('name', t)}: " + ", ".join(f"{x['date']} {x['pattern']}({x['kind']})" for x in recent_candles[t])
                  for t in pf if recent_candles[t]]
         if notes:
             text += "\n\n### 보유 종목 캔들 신호 (최근 3거래일)\n" + "\n".join(notes)
+        holdings_text = text
         (out / "holdings.md").write_text(text, encoding="utf-8")
+        # 보유 종목도 자료 묶음을 만듭니다(부서들이 '자료 없음'으로 넘기지 않게): 지표·수급·일봉·점검 결과
+        for t in pf:
+            doc = [f"# 자료 묶음: {pf[t].get('name', t)} ({t}) — 보유 종목",
+                   "", "## 보유 현황과 규칙 제안", "```json",
+                   json.dumps({k: v for k, v in next(r for r in hres["rows"] if r["ticker"] == t).items()}, ensure_ascii=False, indent=2, default=str), "```",
+                   "", "## 지표 스냅샷", "```json", json.dumps(snaps[t], ensure_ascii=False, indent=2), "```",
+                   "", "## 강도 (상대강도 · 추세 템플릿 · 20일 코스피 대비 흐름)", "```json",
+                   json.dumps({"상대강도": rs.get(t), "추세_템플릿": templates[t], "20일_코스피대비_흐름": history[t]}, ensure_ascii=False, indent=2), "```",
+                   "", "## 캔들 신호 (최근 3거래일, 최신 먼저)", "```json", json.dumps(recent_candles[t], ensure_ascii=False, indent=2), "```",
+                   "", "## 수급·펀더멘털 (KRX 로그인 없으면 null)", "```json",
+                   json.dumps({"foreign_net_5d": data.foreign_net_5d(t), "fundamental": data.fundamental(t)}, ensure_ascii=False, indent=2), "```",
+                   "", "## 최근 20거래일 일봉", "```", frames[t].tail(20)[["시가", "고가", "저가", "종가", "거래량"]].to_string(), "```"]
+            (out / f"dossier_{t}.md").write_text("\n".join(doc), encoding="utf-8")
     elif pf:
         failures["holdings"] = f"보유 종목 시세 일부를 받지 못해 점검을 건너뜁니다: {[t for t in pf if t not in frames]}"
 
@@ -223,6 +259,12 @@ def main() -> int:
         "candles_today": {t: rc for t, rc in recent_candles.items() if rc and rc[0]["date"] == snaps[t]["date"]}, "universe": snaps, "failures": failures,
     }
     (out / "screen.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    # 결재 문서 초안: 숫자 칸은 코드가 채우고, 위원장은 [[…]] 칸(부서 의견·결론)만 채웁니다.
+    paper_md = ROOT / "reports" / "paper.md"
+    paper_lines = [ln for ln in paper_md.read_text(encoding="utf-8").splitlines() if ln.startswith("- ")][:4] if paper_md.exists() else []
+    (out / "brief_draft.md").write_text(brief.render({
+        "summary": summary, "picks": picks, "holdings": hres, "holdings_text": holdings_text, "paper_lines": paper_lines,
+        "n_frames": len(frames), "n_candidates": len(candidates)}), encoding="utf-8")
     print(f"완료: {len(frames)}종목 수집, 셋업 성립 {len(candidates)}건, 회의 상정 {len(picks)}건, 시장 {mkt['regime']} → {out}")
     return 0
 

@@ -8,6 +8,7 @@
 """
 import pandas as pd
 
+FULL_EDGE_PCT = 1.0  # 국면 평균 수익이 이 값 이상이면 '국면별 셋업 성적' 만점
 RS_WEIGHTS = [(63, 0.4), (126, 0.2), (189, 0.2), (252, 0.2)]  # (거래일, 가중치): 최근 3개월에 두 배 무게
 
 
@@ -40,6 +41,15 @@ def rs_ratings(closes: dict[str, pd.Series], index_close: pd.Series | None = Non
     return out
 
 
+def excess_20d_history(close: pd.Series, index_close: pd.Series | None, n: int = 5) -> list[dict]:
+    """최근 n거래일의 '20일 코스피 대비 초과수익률(%p)' 흐름. 보유 종목이 시장보다 약해지는지 미리 봅니다."""
+    if index_close is None:
+        return []
+    idx = index_close.reindex(close.index).ffill()
+    ex = ((close / close.shift(20) - 1) - (idx / idx.shift(20) - 1)) * 100
+    return [{"date": d.strftime("%Y-%m-%d"), "rs_20d": round(float(v), 2)} for d, v in ex.dropna().tail(n).items()]
+
+
 def trend_template(df: pd.DataFrame, rs_rating: int | None = None) -> dict:
     """미너비니 추세 템플릿(우리 이평선 버전). 통과 개수와 항목별 결과."""
     c = df["종가"]
@@ -63,11 +73,15 @@ def score(regime_stats: dict | None, pooled_stats: dict | None, rs: dict | None,
           ticker_stats: dict | None, candle_bonus: bool, candle_warning: bool) -> dict:
     """종합 점수(0~100)와 점수표. 리스크 판정과는 별개이며, 같은 리스크 판정 안에서 순서를 정할 때만 씁니다."""
     parts = {}
-    # 1) 지금 국면에서 이 셋업이 통했나 (30점): 국면별 표본이 20번 이상이면 그 성적, 아니면 전체 성적을 절반만 반영
+    # 1) 지금 국면에서 이 셋업이 통했나 (30점): 평균 수익에 비례(+1.0% 이상이면 만점, 0% 이하면 0점).
+    #    예전에는 평균이 +0.02%여도 30점 만점이었습니다. 우위가 얇으면 점수도 얇게 줍니다.
+    #    국면별 표본이 20번 미만이면 전체 성적을 절반(15점 만점)만 반영합니다.
+    def edge(st: dict, full: int) -> int:
+        return round(full * min(1.0, max(0.0, st.get("avg_ret_pct", 0)) / FULL_EDGE_PCT))
     if regime_stats and regime_stats.get("reliable"):
-        parts["국면별 셋업 성적"] = 30 if regime_stats.get("avg_ret_pct", 0) > 0 else 0
+        parts["국면별 셋업 성적"] = edge(regime_stats, 30)
     elif pooled_stats and pooled_stats.get("reliable"):
-        parts["국면별 셋업 성적"] = 15 if pooled_stats.get("avg_ret_pct", 0) > 0 else 0
+        parts["국면별 셋업 성적"] = edge(pooled_stats, 15)
     else:
         parts["국면별 셋업 성적"] = 0
     # 2) 상대강도 (25점)
