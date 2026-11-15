@@ -1,0 +1,242 @@
+[
+  {
+    "ticker": "055550",
+    "name": "신한지주",
+    "verdict": "통과 → 승인 요청",
+    "shares": 22,
+    "setup": "반전",
+    "why": "과매도(RSI<30) 뒤 20일선을 위로 뚫었습니다",
+    "entry": 89800,
+    "entry_zone": [
+      89351,
+      90249
+    ],
+    "stop": 85310,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        98780,
+        0.5
+      ],
+      [
+        103270,
+        0.5
+      ]
+    ],
+    "target": 98780,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "최근 10일 최저가를 깨면 무효",
+    "stop_atr_multiple": 1.25
+  },
+  {
+    "ticker": "068270",
+    "name": "셀트리온",
+    "verdict": "통과 → 승인 요청",
+    "shares": 9,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 213500,
+    "entry_zone": [
+      212432,
+      214567
+    ],
+    "stop": 202825,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        234850,
+        0.5
+      ],
+      [
+        245525,
+        0.5
+      ]
+    ],
+    "target": 234850,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 1.24
+  },
+  {
+    "ticker": "068270",
+    "name": "셀트리온",
+    "verdict": "통과 → 승인 요청",
+    "shares": 9,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 213500,
+    "entry_zone": [
+      212432,
+      214567
+    ],
+    "stop": 202825,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        234850,
+        0.5
+      ],
+      [
+        245525,
+        0.5
+      ]
+    ],
+    "target": 234850,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 1.24
+  },
+  {
+    "ticker": "028050",
+    "name": "삼성E&A",
+    "verdict": "차단 → 매매 보류",
+    "shares": 28,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 69400,
+    "entry_zone": [
+      69053,
+      69747
+    ],
+    "stop": 65930,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        76340,
+        0.5
+      ],
+      [
+        79810,
+        0.5
+      ]
+    ],
+    "target": 76340,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 0.88
+  },
+  {
+    "ticker": "028050",
+    "name": "삼성E&A",
+    "verdict": "차단 → 매매 보류",
+    "shares": 28,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 69400,
+    "entry_zone": [
+      69053,
+      69747
+    ],
+    "stop": 65930,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        76340,
+        0.5
+      ],
+      [
+        79810,
+        0.5
+      ]
+    ],
+    "target": 76340,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 0.88
+  },
+  {
+    "ticker": "018260",
+    "name": "삼성에스디에스",
+    "verdict": "차단 → 매매 보류",
+    "shares": 8,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 235500,
+    "entry_zone": [
+      234322,
+      236677
+    ],
+    "stop": 223725,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        259050,
+        0.5
+      ],
+      [
+        270825,
+        0.5
+      ]
+    ],
+    "target": 259050,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 0.79
+  },
+  {
+    "ticker": "180640",
+    "name": "한진칼",
+    "verdict": "차단 → 매매 보류",
+    "shares": 10,
+    "setup": "추세지속",
+    "why": "20·60·120일선 정배열, 20일선이 오르는 중입니다",
+    "entry": 200000,
+    "entry_zone": [
+      199000,
+      201000
+    ],
+    "stop": 190000,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        220000,
+        0.5
+      ],
+      [
+        230000,
+        0.5
+      ]
+    ],
+    "target": 220000,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "20일선이 60일선 아래로 내려가면(역배열) 무효",
+    "stop_atr_multiple": 0.43
+  },
+  {
+    "ticker": "180640",
+    "name": "한진칼",
+    "verdict": "차단 → 매매 보류",
+    "shares": 10,
+    "setup": "모멘텀",
+    "why": "20일간 10% 이상 오르며 과열 전 구간입니다",
+    "entry": 200000,
+    "entry_zone": [
+      199000,
+      201000
+    ],
+    "stop": 190000,
+    "stop_pct": -5.0,
+    "targets": [
+      [
+        220000,
+        0.5
+      ],
+      [
+        230000,
+        0.5
+      ]
+    ],
+    "target": 220000,
+    "target_pct": 10.0,
+    "rr": 2.0,
+    "invalidation": "종가가 20일선 아래로 내려가면 무효",
+    "stop_atr_multiple": 0.43
+  }
+]
