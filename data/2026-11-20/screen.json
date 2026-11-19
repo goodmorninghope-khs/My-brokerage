@@ -1,0 +1,1802 @@
+{
+  "date": "2026-11-20",
+  "market": {
+    "date": "2026-11-19",
+    "kospi": 5137.89,
+    "change_1d_pct": 1.39,
+    "change_5d_pct": -3.83,
+    "regime": "하락장",
+    "stance": "방어: 신규 매수 최소화, 국면 성적이 플러스인 셋업만 소액",
+    "shock": false,
+    "fit": {
+      "fit": [],
+      "thin": [],
+      "avoid": [
+        {
+          "setup": "눌림목",
+          "trades": 142,
+          "win_rate_pct": 38.0,
+          "avg_ret_pct": -0.1
+        },
+        {
+          "setup": "돌파",
+          "trades": 61,
+          "win_rate_pct": 24.6,
+          "avg_ret_pct": -0.77
+        },
+        {
+          "setup": "추세지속",
+          "trades": 31,
+          "win_rate_pct": 32.3,
+          "avg_ret_pct": -1.0
+        },
+        {
+          "setup": "모멘텀",
+          "trades": 137,
+          "win_rate_pct": 29.9,
+          "avg_ret_pct": -1.01
+        },
+        {
+          "setup": "반전",
+          "trades": 65,
+          "win_rate_pct": 29.2,
+          "avg_ret_pct": -1.35
+        }
+      ],
+      "unknown": []
+    },
+    "shock_outlook": [
+      {
+        "step": 1,
+        "base_date": "2026-11-13",
+        "floor_5d": 4920.2,
+        "low_1d": 4983.8,
+        "high_1d": 5292.0,
+        "lower": 4983.8,
+        "upper": 5292.0,
+        "possible": true,
+        "lower_pct": -3.0,
+        "upper_pct": 3.0
+      },
+      {
+        "step": 2,
+        "base_date": "2026-11-16",
+        "floor_5d": 4743.5
+      },
+      {
+        "step": 3,
+        "base_date": "2026-11-17",
+        "floor_5d": 4620.7
+      }
+    ],
+    "recent": [
+      {
+        "date": "2026-11-12",
+        "close": 5342.73,
+        "change_pct": -0.61
+      },
+      {
+        "date": "2026-11-13",
+        "close": 5290.53,
+        "change_pct": -0.98
+      },
+      {
+        "date": "2026-11-16",
+        "close": 5100.5,
+        "change_pct": -3.59
+      },
+      {
+        "date": "2026-11-17",
+        "close": 4968.48,
+        "change_pct": -2.59
+      },
+      {
+        "date": "2026-11-18",
+        "close": 5067.44,
+        "change_pct": 1.99
+      },
+      {
+        "date": "2026-11-19",
+        "close": 5137.89,
+        "change_pct": 1.39
+      }
+    ]
+  },
+  "risk_rules": {
+    "capital": 10000000,
+    "risk_per_trade_pct": 1,
+    "max_position_pct": 20,
+    "position_flex_pct": 5,
+    "max_total_exposure_pct": 70,
+    "min_rr": 2.0,
+    "stop_loss_pct": 5,
+    "max_atr_pct": 5,
+    "max_daily_new_buys": 1,
+    "pause_until": "2026-10-16"
+  },
+  "picks": [
+    {
+      "ticker": "068270",
+      "name": "셀트리온",
+      "setup": "모멘텀",
+      "verdict": "통과 → 승인 요청",
+      "score": 42,
+      "rs_rating": 87,
+      "trend_template": "7/7"
+    },
+    {
+      "ticker": "086280",
+      "name": "현대글로비스",
+      "setup": "모멘텀",
+      "verdict": "통과 → 승인 요청",
+      "score": 25,
+      "rs_rating": 62,
+      "trend_template": "3/7"
+    },
+    {
+      "ticker": "180640",
+      "name": "한진칼",
+      "setup": "추세지속",
+      "verdict": "차단 → 매매 보류",
+      "score": 55,
+      "rs_rating": 99,
+      "trend_template": "7/7"
+    }
+  ],
+  "other_candidates": [
+    {
+      "ticker": "068270",
+      "name": "셀트리온",
+      "setup": "추세지속",
+      "verdict": "통과 → 승인 요청"
+    },
+    {
+      "ticker": "003490",
+      "name": "대한항공",
+      "setup": "추세지속",
+      "verdict": "차단 → 매매 보류"
+    },
+    {
+      "ticker": "180640",
+      "name": "한진칼",
+      "setup": "모멘텀",
+      "verdict": "차단 → 매매 보류"
+    },
+    {
+      "ticker": "003490",
+      "name": "대한항공",
+      "setup": "모멘텀",
+      "verdict": "차단 → 매매 보류"
+    }
+  ],
+  "recommend": [
+    {
+      "ticker": "068270",
+      "name": "셀트리온",
+      "setup": "모멘텀"
+    }
+  ],
+  "waiting": [
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "close": 197400,
+      "setup": "캔들:상승장악형",
+      "trigger": 197600,
+      "gap_pct": 0.1,
+      "condition": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체. 다음 날 이 고가를 넘으면 신호 확인",
+      "backtest_all": {
+        "trades": 562,
+        "win_rate_pct": 29.5,
+        "payoff": 2.69,
+        "avg_ret_pct": 0.33,
+        "total_return_pct": 507.21,
+        "mdd_pct": -32.25,
+        "reliable": true
+      }
+    },
+    {
+      "ticker": "042700",
+      "name": "한미반도체",
+      "close": 171900,
+      "setup": "캔들:상승장악형",
+      "trigger": 172400,
+      "gap_pct": 0.29,
+      "condition": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체. 다음 날 이 고가를 넘으면 신호 확인",
+      "backtest_all": {
+        "trades": 562,
+        "win_rate_pct": 29.5,
+        "payoff": 2.69,
+        "avg_ret_pct": 0.33,
+        "total_return_pct": 507.21,
+        "mdd_pct": -32.25,
+        "reliable": true
+      }
+    },
+    {
+      "ticker": "329180",
+      "name": "HD현대중공업",
+      "close": 261000,
+      "setup": "캔들:상승장악형",
+      "trigger": 262000,
+      "gap_pct": 0.38,
+      "condition": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체. 다음 날 이 고가를 넘으면 신호 확인",
+      "backtest_all": {
+        "trades": 562,
+        "win_rate_pct": 29.5,
+        "payoff": 2.69,
+        "avg_ret_pct": 0.33,
+        "total_return_pct": 507.21,
+        "mdd_pct": -32.25,
+        "reliable": true
+      }
+    },
+    {
+      "ticker": "003490",
+      "name": "대한항공",
+      "close": 32650,
+      "setup": "돌파",
+      "trigger": 32800,
+      "gap_pct": 0.46,
+      "condition": "이 가격을 거래량 1.5배 이상으로 넘으면 돌파 신호",
+      "backtest_all": {
+        "trades": 313,
+        "win_rate_pct": 31.0,
+        "payoff": 2.52,
+        "avg_ret_pct": 0.35,
+        "total_return_pct": 93.29,
+        "mdd_pct": -26.03,
+        "reliable": true
+      }
+    },
+    {
+      "ticker": "068270",
+      "name": "셀트리온",
+      "close": 214500,
+      "setup": "돌파",
+      "trigger": 219000,
+      "gap_pct": 2.1,
+      "condition": "이 가격을 거래량 1.5배 이상으로 넘으면 돌파 신호",
+      "backtest_all": {
+        "trades": 313,
+        "win_rate_pct": 31.0,
+        "payoff": 2.52,
+        "avg_ret_pct": 0.35,
+        "total_return_pct": 93.29,
+        "mdd_pct": -26.03,
+        "reliable": true
+      }
+    }
+  ],
+  "backtest_by_setup": {
+    "눌림목": {
+      "trades": 621,
+      "win_rate_pct": 38.5,
+      "payoff": 1.8,
+      "avg_ret_pct": 0.38,
+      "total_return_pct": 126.36,
+      "mdd_pct": -34.38,
+      "reliable": true
+    },
+    "돌파": {
+      "trades": 313,
+      "win_rate_pct": 31.0,
+      "payoff": 2.52,
+      "avg_ret_pct": 0.35,
+      "total_return_pct": 93.29,
+      "mdd_pct": -26.03,
+      "reliable": true
+    },
+    "모멘텀": {
+      "trades": 554,
+      "win_rate_pct": 36.3,
+      "payoff": 1.93,
+      "avg_ret_pct": 0.33,
+      "total_return_pct": 86.16,
+      "mdd_pct": -42.1,
+      "reliable": true
+    },
+    "반전": {
+      "trades": 93,
+      "win_rate_pct": 35.5,
+      "payoff": 1.65,
+      "avg_ret_pct": -0.32,
+      "total_return_pct": -2.22,
+      "mdd_pct": -18.29,
+      "reliable": true
+    },
+    "추세지속": {
+      "trades": 352,
+      "win_rate_pct": 43.5,
+      "payoff": 1.81,
+      "avg_ret_pct": 1.15,
+      "total_return_pct": 157.69,
+      "mdd_pct": -17.87,
+      "reliable": true
+    }
+  },
+  "backtest_by_setup_regime": {
+    "눌림목": {
+      "상승장": {
+        "trades": 435,
+        "win_rate_pct": 37.9,
+        "payoff": 1.87,
+        "avg_ret_pct": 0.44,
+        "total_return_pct": 99.03,
+        "mdd_pct": -29.48,
+        "reliable": true
+      },
+      "하락장": {
+        "trades": 142,
+        "win_rate_pct": 38.0,
+        "payoff": 1.58,
+        "avg_ret_pct": -0.1,
+        "total_return_pct": 1.61,
+        "mdd_pct": -20.56,
+        "reliable": true
+      },
+      "횡보장": {
+        "trades": 44,
+        "win_rate_pct": 45.5,
+        "payoff": 1.78,
+        "avg_ret_pct": 1.29,
+        "total_return_pct": 11.93,
+        "mdd_pct": -7.85,
+        "reliable": true
+      }
+    },
+    "돌파": {
+      "상승장": {
+        "trades": 226,
+        "win_rate_pct": 32.3,
+        "payoff": 2.45,
+        "avg_ret_pct": 0.45,
+        "total_return_pct": 39.65,
+        "mdd_pct": -19.11,
+        "reliable": true
+      },
+      "하락장": {
+        "trades": 61,
+        "win_rate_pct": 24.6,
+        "payoff": 2.32,
+        "avg_ret_pct": -0.77,
+        "total_return_pct": -2.32,
+        "mdd_pct": -20.62,
+        "reliable": true
+      },
+      "횡보장": {
+        "trades": 26,
+        "win_rate_pct": 34.6,
+        "payoff": 3.48,
+        "avg_ret_pct": 2.18,
+        "total_return_pct": 41.7,
+        "mdd_pct": -6.19,
+        "reliable": true
+      }
+    },
+    "모멘텀": {
+      "상승장": {
+        "trades": 360,
+        "win_rate_pct": 39.4,
+        "payoff": 2.06,
+        "avg_ret_pct": 1.09,
+        "total_return_pct": 156.16,
+        "mdd_pct": -19.78,
+        "reliable": true
+      },
+      "하락장": {
+        "trades": 137,
+        "win_rate_pct": 29.9,
+        "payoff": 1.69,
+        "avg_ret_pct": -1.01,
+        "total_return_pct": -19.46,
+        "mdd_pct": -25.81,
+        "reliable": true
+      },
+      "횡보장": {
+        "trades": 57,
+        "win_rate_pct": 31.6,
+        "payoff": 1.49,
+        "avg_ret_pct": -1.24,
+        "total_return_pct": -9.76,
+        "mdd_pct": -21.2,
+        "reliable": true
+      }
+    },
+    "반전": {
+      "상승장": {
+        "trades": 24,
+        "win_rate_pct": 50.0,
+        "payoff": 1.86,
+        "avg_ret_pct": 2.13,
+        "total_return_pct": 11.79,
+        "mdd_pct": -4.9,
+        "reliable": true
+      },
+      "하락장": {
+        "trades": 65,
+        "win_rate_pct": 29.2,
+        "payoff": 1.59,
+        "avg_ret_pct": -1.35,
+        "total_return_pct": -13.84,
+        "mdd_pct": -17.01,
+        "reliable": true
+      },
+      "횡보장": {
+        "trades": 4,
+        "win_rate_pct": 50.0,
+        "payoff": 1.86,
+        "avg_ret_pct": 1.67,
+        "total_return_pct": 1.51,
+        "mdd_pct": -1.0,
+        "reliable": false
+      }
+    },
+    "추세지속": {
+      "상승장": {
+        "trades": 297,
+        "win_rate_pct": 44.4,
+        "payoff": 1.83,
+        "avg_ret_pct": 1.36,
+        "total_return_pct": 151.54,
+        "mdd_pct": -15.39,
+        "reliable": true
+      },
+      "하락장": {
+        "trades": 31,
+        "win_rate_pct": 32.3,
+        "payoff": 1.48,
+        "avg_ret_pct": -1.0,
+        "total_return_pct": -5.09,
+        "mdd_pct": -14.04,
+        "reliable": true
+      },
+      "횡보장": {
+        "trades": 24,
+        "win_rate_pct": 45.8,
+        "payoff": 1.75,
+        "avg_ret_pct": 1.38,
+        "total_return_pct": 7.94,
+        "mdd_pct": -3.0,
+        "reliable": true
+      }
+    }
+  },
+  "candle_backtest": {
+    "망치형": {
+      "trades": 628,
+      "win_rate_pct": 21.5,
+      "payoff": 3.04,
+      "avg_ret_pct": -0.41,
+      "total_return_pct": 129.46,
+      "mdd_pct": -52.42,
+      "reliable": true
+    },
+    "상승장악형": {
+      "trades": 562,
+      "win_rate_pct": 29.5,
+      "payoff": 2.69,
+      "avg_ret_pct": 0.33,
+      "total_return_pct": 507.21,
+      "mdd_pct": -32.25,
+      "reliable": true
+    },
+    "샛별형": {
+      "trades": 279,
+      "win_rate_pct": 24.0,
+      "payoff": 3.13,
+      "avg_ret_pct": -0.02,
+      "total_return_pct": 2.75,
+      "mdd_pct": -25.62,
+      "reliable": true
+    },
+    "적삼병": {
+      "trades": 45,
+      "win_rate_pct": 31.1,
+      "payoff": 3.23,
+      "avg_ret_pct": 1.1,
+      "total_return_pct": 34.83,
+      "mdd_pct": -8.43,
+      "reliable": true
+    }
+  },
+  "validated_candles": [
+    "상승장악형",
+    "적삼병"
+  ],
+  "candles_today": {
+    "005930": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "상승장악형",
+        "kind": "상승",
+        "meaning": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      },
+      {
+        "date": "2026-11-17",
+        "pattern": "유성형",
+        "kind": "하락",
+        "meaning": "상승 끝에 긴 윗꼬리 — 고점에서 매도에 밀림"
+      }
+    ],
+    "066570": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      },
+      {
+        "date": "2026-11-17",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "000990": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      }
+    ],
+    "005380": [
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "034020": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "샛별형",
+        "kind": "상승",
+        "meaning": "큰 음봉 → 작은 몸통(망설임) → 큰 양봉 — 바닥 다지기"
+      }
+    ],
+    "052690": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "샛별형",
+        "kind": "상승",
+        "meaning": "큰 음봉 → 작은 몸통(망설임) → 큰 양봉 — 바닥 다지기"
+      }
+    ],
+    "207940": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "028260": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "006400": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      }
+    ],
+    "012450": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-17",
+        "pattern": "하락장악형",
+        "kind": "하락",
+        "meaning": "상승 끝에 음봉이 전날 양봉을 통째로 감쌈 — 매도 우위 전환"
+      }
+    ],
+    "329180": [
+      {
+        "date": "2026-11-19",
+        "pattern": "상승장악형",
+        "kind": "상승",
+        "meaning": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "샛별형",
+        "kind": "상승",
+        "meaning": "큰 음봉 → 작은 몸통(망설임) → 큰 양봉 — 바닥 다지기"
+      }
+    ],
+    "138040": [
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "상승장악형",
+        "kind": "상승",
+        "meaning": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체"
+      }
+    ],
+    "033780": [
+      {
+        "date": "2026-11-19",
+        "pattern": "유성형",
+        "kind": "하락",
+        "meaning": "상승 끝에 긴 윗꼬리 — 고점에서 매도에 밀림"
+      }
+    ],
+    "017670": [
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "298040": [
+      {
+        "date": "2026-11-19",
+        "pattern": "샛별형",
+        "kind": "상승",
+        "meaning": "큰 음봉 → 작은 몸통(망설임) → 큰 양봉 — 바닥 다지기"
+      }
+    ],
+    "042700": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "상승장악형",
+        "kind": "상승",
+        "meaning": "하락 끝에 양봉이 전날 음봉 몸통을 통째로 감쌈 — 주도권 교체"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      },
+      {
+        "date": "2026-11-17",
+        "pattern": "유성형",
+        "kind": "하락",
+        "meaning": "상승 끝에 긴 윗꼬리 — 고점에서 매도에 밀림"
+      }
+    ],
+    "009540": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "003670": [
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "010140": [
+      {
+        "date": "2026-11-19",
+        "pattern": "샛별형",
+        "kind": "상승",
+        "meaning": "큰 음봉 → 작은 몸통(망설임) → 큰 양봉 — 바닥 다지기"
+      }
+    ],
+    "035720": [
+      {
+        "date": "2026-11-19",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "042660": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      },
+      {
+        "date": "2026-11-18",
+        "pattern": "도지",
+        "kind": "중립",
+        "meaning": "시가≈종가 — 매수·매도 힘겨루기, 방향 전환 전조일 수 있음"
+      }
+    ],
+    "003550": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      }
+    ],
+    "196170": [
+      {
+        "date": "2026-11-19",
+        "pattern": "망치형",
+        "kind": "상승",
+        "meaning": "하락 끝에 긴 아래꼬리 — 장중 매도를 사자 세력이 받아냄"
+      }
+    ]
+  },
+  "universe": {
+    "005930": {
+      "name": "삼성전자",
+      "source": "관심종목",
+      "mcap_rank": 1,
+      "date": "2026-11-19",
+      "close": 197400.0,
+      "change_1d_pct": 0.51,
+      "change_20d_pct": -7.97,
+      "ma20": 210145.0,
+      "ma60": 240131.7,
+      "rsi14": 41.6,
+      "volume_ratio": 0.71,
+      "high_52w": 374500.0,
+      "from_52w_high_pct": -47.29,
+      "rs_raw": 19.04,
+      "rs_rating": 76,
+      "rs_20d": -0.82,
+      "trend_template": "2/7"
+    },
+    "000660": {
+      "name": "SK하이닉스",
+      "source": "관심종목",
+      "mcap_rank": 2,
+      "date": "2026-11-19",
+      "close": 1190000.0,
+      "change_1d_pct": 2.23,
+      "change_20d_pct": -3.57,
+      "ma20": 1287200.0,
+      "ma60": 1533800.0,
+      "rsi14": 42.4,
+      "volume_ratio": 0.68,
+      "high_52w": 2987000.0,
+      "from_52w_high_pct": -60.16,
+      "rs_raw": 20.58,
+      "rs_rating": 80,
+      "rs_20d": 3.59,
+      "trend_template": "2/7"
+    },
+    "066570": {
+      "name": "LG전자",
+      "source": "관심종목",
+      "mcap_rank": 24,
+      "date": "2026-11-19",
+      "close": 136800.0,
+      "change_1d_pct": -0.44,
+      "change_20d_pct": -13.69,
+      "ma20": 144365.0,
+      "ma60": 180233.3,
+      "rsi14": 38.3,
+      "volume_ratio": 0.7,
+      "high_52w": 438000.0,
+      "from_52w_high_pct": -68.77,
+      "rs_raw": 6.32,
+      "rs_rating": 61,
+      "rs_20d": -6.54,
+      "trend_template": "1/7"
+    },
+    "000990": {
+      "name": "DB하이텍",
+      "source": "관심종목",
+      "date": "2026-11-19",
+      "close": 76000.0,
+      "change_1d_pct": 0.26,
+      "change_20d_pct": -22.76,
+      "ma20": 88385.0,
+      "ma60": 105253.3,
+      "rsi14": 38.6,
+      "volume_ratio": 0.8,
+      "high_52w": 230500.0,
+      "from_52w_high_pct": -67.03,
+      "rs_raw": -4.75,
+      "rs_rating": 45,
+      "rs_20d": -15.61,
+      "trend_template": "1/7"
+    },
+    "005380": {
+      "name": "현대차",
+      "source": "관심종목",
+      "mcap_rank": 7,
+      "date": "2026-11-19",
+      "close": 267500.0,
+      "change_1d_pct": -0.19,
+      "change_20d_pct": -10.98,
+      "ma20": 278925.0,
+      "ma60": 332683.3,
+      "rsi14": 38.4,
+      "volume_ratio": 0.68,
+      "high_52w": 783000.0,
+      "from_52w_high_pct": -65.84,
+      "rs_raw": -25.32,
+      "rs_rating": 18,
+      "rs_20d": -3.83,
+      "trend_template": "0/7"
+    },
+    "034020": {
+      "name": "두산에너빌리티",
+      "source": "관심종목",
+      "mcap_rank": 19,
+      "date": "2026-11-19",
+      "close": 43850.0,
+      "change_1d_pct": 1.04,
+      "change_20d_pct": -28.47,
+      "ma20": 50440.0,
+      "ma60": 69838.3,
+      "rsi14": 32.5,
+      "volume_ratio": 0.71,
+      "high_52w": 139200.0,
+      "from_52w_high_pct": -68.5,
+      "rs_raw": -38.13,
+      "rs_rating": 7,
+      "rs_20d": -21.31,
+      "trend_template": "0/7"
+    },
+    "052690": {
+      "name": "한전기술",
+      "source": "관심종목",
+      "date": "2026-11-19",
+      "close": 67300.0,
+      "change_1d_pct": 0.3,
+      "change_20d_pct": -29.31,
+      "ma20": 79700.0,
+      "ma60": 107023.3,
+      "rsi14": 29.8,
+      "volume_ratio": 0.55,
+      "high_52w": 198000.0,
+      "from_52w_high_pct": -66.01,
+      "rs_raw": -28.36,
+      "rs_rating": 14,
+      "rs_20d": -22.15,
+      "trend_template": "0/7"
+    },
+    "402340": {
+      "name": "SK스퀘어",
+      "source": "시총상위",
+      "mcap_rank": 3,
+      "date": "2026-11-19",
+      "close": 743000.0,
+      "change_1d_pct": 3.77,
+      "change_20d_pct": -0.8,
+      "ma20": 805900.0,
+      "ma60": 950016.7,
+      "rsi14": 43.3,
+      "volume_ratio": 0.53,
+      "high_52w": 2189000.0,
+      "from_52w_high_pct": -66.06,
+      "rs_raw": 30.36,
+      "rs_rating": 89,
+      "rs_20d": 6.35,
+      "trend_template": "2/7"
+    },
+    "373220": {
+      "name": "LG에너지솔루션",
+      "source": "시총상위",
+      "mcap_rank": 4,
+      "date": "2026-11-19",
+      "close": 303500.0,
+      "change_1d_pct": -1.14,
+      "change_20d_pct": -22.48,
+      "ma20": 341800.0,
+      "ma60": 363000.0,
+      "rsi14": 33.3,
+      "volume_ratio": 0.57,
+      "high_52w": 497500.0,
+      "from_52w_high_pct": -38.99,
+      "rs_raw": -11.39,
+      "rs_rating": 38,
+      "rs_20d": -15.32,
+      "trend_template": "1/7"
+    },
+    "009150": {
+      "name": "삼성전기",
+      "source": "시총상위",
+      "mcap_rank": 5,
+      "date": "2026-11-19",
+      "close": 883000.0,
+      "change_1d_pct": 7.68,
+      "change_20d_pct": -22.95,
+      "ma20": 1005450.0,
+      "ma60": 1265716.7,
+      "rsi14": 40.6,
+      "volume_ratio": 1.09,
+      "high_52w": 2417000.0,
+      "from_52w_high_pct": -63.47,
+      "rs_raw": 90.46,
+      "rs_rating": 97,
+      "rs_20d": -15.8,
+      "trend_template": "3/7"
+    },
+    "207940": {
+      "name": "삼성바이오로직스",
+      "source": "시총상위",
+      "mcap_rank": 6,
+      "date": "2026-11-19",
+      "close": 1371000.0,
+      "change_1d_pct": -0.51,
+      "change_20d_pct": 0.73,
+      "ma20": 1434850.0,
+      "ma60": 1408510.4,
+      "rsi14": 43.7,
+      "volume_ratio": 0.58,
+      "high_52w": 1971704.0,
+      "from_52w_high_pct": -30.47,
+      "rs_raw": -1.75,
+      "rs_rating": 51,
+      "rs_20d": 7.89,
+      "trend_template": "2/7"
+    },
+    "105560": {
+      "name": "KB금융",
+      "source": "시총상위",
+      "mcap_rank": 8,
+      "date": "2026-11-19",
+      "close": 154500.0,
+      "change_1d_pct": -1.09,
+      "change_20d_pct": -2.15,
+      "ma20": 154140.0,
+      "ma60": 164476.7,
+      "rsi14": 45.5,
+      "volume_ratio": 0.54,
+      "high_52w": 194500.0,
+      "from_52w_high_pct": -20.57,
+      "rs_raw": 12.91,
+      "rs_rating": 68,
+      "rs_20d": 5.0,
+      "trend_template": "2/7"
+    },
+    "032830": {
+      "name": "삼성생명",
+      "source": "시총상위",
+      "mcap_rank": 9,
+      "date": "2026-11-19",
+      "close": 256500.0,
+      "change_1d_pct": 0.79,
+      "change_20d_pct": 6.65,
+      "ma20": 254825.0,
+      "ma60": 273616.7,
+      "rsi14": 50.1,
+      "volume_ratio": 0.93,
+      "high_52w": 516500.0,
+      "from_52w_high_pct": -50.34,
+      "rs_raw": 20.91,
+      "rs_rating": 82,
+      "rs_20d": 13.81,
+      "trend_template": "2/7"
+    },
+    "068270": {
+      "name": "셀트리온",
+      "source": "시총상위",
+      "mcap_rank": 10,
+      "date": "2026-11-19",
+      "close": 214500.0,
+      "change_1d_pct": 3.37,
+      "change_20d_pct": 10.85,
+      "ma20": 202205.0,
+      "ma60": 190433.3,
+      "rsi14": 64.0,
+      "volume_ratio": 0.82,
+      "high_52w": 239244.0,
+      "from_52w_high_pct": -10.34,
+      "rs_raw": 24.31,
+      "rs_rating": 87,
+      "rs_20d": 18.01,
+      "trend_template": "7/7"
+    },
+    "028260": {
+      "name": "삼성물산",
+      "source": "시총상위",
+      "mcap_rank": 11,
+      "date": "2026-11-19",
+      "close": 274500.0,
+      "change_1d_pct": 0.55,
+      "change_20d_pct": -4.52,
+      "ma20": 292000.0,
+      "ma60": 327550.0,
+      "rsi14": 41.7,
+      "volume_ratio": 0.71,
+      "high_52w": 565000.0,
+      "from_52w_high_pct": -51.42,
+      "rs_raw": -2.19,
+      "rs_rating": 49,
+      "rs_20d": 2.63,
+      "trend_template": "1/7"
+    },
+    "055550": {
+      "name": "신한지주",
+      "source": "시총상위",
+      "mcap_rank": 12,
+      "date": "2026-11-19",
+      "close": 85900.0,
+      "change_1d_pct": -1.49,
+      "change_20d_pct": -4.56,
+      "ma20": 87470.0,
+      "ma60": 99941.7,
+      "rsi14": 37.8,
+      "volume_ratio": 0.51,
+      "high_52w": 116500.0,
+      "from_52w_high_pct": -26.27,
+      "rs_raw": 1.9,
+      "rs_rating": 55,
+      "rs_20d": 2.6,
+      "trend_template": "0/7"
+    },
+    "034730": {
+      "name": "SK",
+      "source": "시총상위",
+      "mcap_rank": 13,
+      "date": "2026-11-19",
+      "close": 498000.0,
+      "change_1d_pct": 0.91,
+      "change_20d_pct": 8.26,
+      "ma20": 494125.0,
+      "ma60": 530866.7,
+      "rsi14": 49.9,
+      "volume_ratio": 0.57,
+      "high_52w": 883000.0,
+      "from_52w_high_pct": -43.6,
+      "rs_raw": 34.97,
+      "rs_rating": 91,
+      "rs_20d": 15.41,
+      "trend_template": "2/7"
+    },
+    "000270": {
+      "name": "기아",
+      "source": "시총상위",
+      "mcap_rank": 14,
+      "date": "2026-11-19",
+      "close": 91700.0,
+      "change_1d_pct": -0.86,
+      "change_20d_pct": -15.41,
+      "ma20": 98410.0,
+      "ma60": 112443.3,
+      "rsi14": 31.1,
+      "volume_ratio": 0.78,
+      "high_52w": 212500.0,
+      "from_52w_high_pct": -56.85,
+      "rs_raw": -22.78,
+      "rs_rating": 26,
+      "rs_20d": -8.25,
+      "trend_template": "0/7"
+    },
+    "006400": {
+      "name": "삼성SDI",
+      "source": "시총상위",
+      "mcap_rank": 15,
+      "date": "2026-11-19",
+      "close": 430000.0,
+      "change_1d_pct": -2.38,
+      "change_20d_pct": -16.5,
+      "ma20": 486100.0,
+      "ma60": 525616.7,
+      "rsi14": 39.9,
+      "volume_ratio": 0.87,
+      "high_52w": 723000.0,
+      "from_52w_high_pct": -40.53,
+      "rs_raw": 10.97,
+      "rs_rating": 64,
+      "rs_20d": -9.35,
+      "trend_template": "2/7"
+    },
+    "086790": {
+      "name": "하나금융지주",
+      "source": "시총상위",
+      "mcap_rank": 16,
+      "date": "2026-11-19",
+      "close": 124000.0,
+      "change_1d_pct": 0.0,
+      "change_20d_pct": 3.33,
+      "ma20": 119645.0,
+      "ma60": 127581.7,
+      "rsi14": 53.7,
+      "volume_ratio": 0.82,
+      "high_52w": 142500.0,
+      "from_52w_high_pct": -12.98,
+      "rs_raw": 17.61,
+      "rs_rating": 72,
+      "rs_20d": 10.49,
+      "trend_template": "4/7"
+    },
+    "012450": {
+      "name": "한화에어로스페이스",
+      "source": "시총상위",
+      "mcap_rank": 17,
+      "date": "2026-11-19",
+      "close": 630000.0,
+      "change_1d_pct": -0.47,
+      "change_20d_pct": -22.51,
+      "ma20": 693050.0,
+      "ma60": 904383.3,
+      "rsi14": 32.4,
+      "volume_ratio": 0.52,
+      "high_52w": 1655000.0,
+      "from_52w_high_pct": -61.93,
+      "rs_raw": -32.45,
+      "rs_rating": 11,
+      "rs_20d": -15.36,
+      "trend_template": "0/7"
+    },
+    "012330": {
+      "name": "현대모비스",
+      "source": "시총상위",
+      "mcap_rank": 18,
+      "date": "2026-11-19",
+      "close": 343000.0,
+      "change_1d_pct": -4.06,
+      "change_20d_pct": 2.39,
+      "ma20": 347500.0,
+      "ma60": 379291.7,
+      "rsi14": 45.4,
+      "volume_ratio": 1.09,
+      "high_52w": 822000.0,
+      "from_52w_high_pct": -58.27,
+      "rs_raw": -12.2,
+      "rs_rating": 36,
+      "rs_20d": 9.54,
+      "trend_template": "0/7"
+    },
+    "329180": {
+      "name": "HD현대중공업",
+      "source": "시총상위",
+      "mcap_rank": 20,
+      "date": "2026-11-19",
+      "close": 261000.0,
+      "change_1d_pct": 1.16,
+      "change_20d_pct": -14.57,
+      "ma20": 273550.0,
+      "ma60": 372775.0,
+      "rsi14": 32.5,
+      "volume_ratio": 0.44,
+      "high_52w": 765000.0,
+      "from_52w_high_pct": -65.88,
+      "rs_raw": -39.84,
+      "rs_rating": 5,
+      "rs_20d": -7.41,
+      "trend_template": "0/7"
+    },
+    "035420": {
+      "name": "NAVER",
+      "source": "시총상위",
+      "mcap_rank": 21,
+      "date": "2026-11-19",
+      "close": 169200.0,
+      "change_1d_pct": -1.46,
+      "change_20d_pct": -3.59,
+      "ma20": 177640.0,
+      "ma60": 191853.3,
+      "rsi14": 41.0,
+      "volume_ratio": 0.62,
+      "high_52w": 304000.0,
+      "from_52w_high_pct": -44.34,
+      "rs_raw": -14.65,
+      "rs_rating": 32,
+      "rs_20d": 3.56,
+      "trend_template": "0/7"
+    },
+    "000810": {
+      "name": "삼성화재",
+      "source": "시총상위",
+      "mcap_rank": 22,
+      "date": "2026-11-19",
+      "close": 528000.0,
+      "change_1d_pct": -1.86,
+      "change_20d_pct": -13.01,
+      "ma20": 596950.0,
+      "ma60": 627416.7,
+      "rsi14": 34.0,
+      "volume_ratio": 0.66,
+      "high_52w": 757000.0,
+      "from_52w_high_pct": -30.25,
+      "rs_raw": 5.31,
+      "rs_rating": 59,
+      "rs_20d": -5.86,
+      "trend_template": "2/7"
+    },
+    "316140": {
+      "name": "우리금융지주",
+      "source": "시총상위",
+      "mcap_rank": 23,
+      "date": "2026-11-19",
+      "close": 31850.0,
+      "change_1d_pct": -0.93,
+      "change_20d_pct": 2.08,
+      "ma20": 31177.5,
+      "ma60": 32951.7,
+      "rsi14": 49.9,
+      "volume_ratio": 0.64,
+      "high_52w": 41500.0,
+      "from_52w_high_pct": -23.25,
+      "rs_raw": 12.34,
+      "rs_rating": 66,
+      "rs_20d": 9.24,
+      "trend_template": "2/7"
+    },
+    "011200": {
+      "name": "HMM",
+      "source": "시총상위",
+      "mcap_rank": 25,
+      "date": "2026-11-19",
+      "close": 22500.0,
+      "change_1d_pct": 0.9,
+      "change_20d_pct": 0.0,
+      "ma20": 22110.0,
+      "ma60": 21779.2,
+      "rsi14": 54.2,
+      "volume_ratio": 0.74,
+      "high_52w": 24950.0,
+      "from_52w_high_pct": -9.82,
+      "rs_raw": 18.11,
+      "rs_rating": 74,
+      "rs_20d": 7.15,
+      "trend_template": "7/7"
+    },
+    "138040": {
+      "name": "메리츠금융지주",
+      "source": "시총상위",
+      "mcap_rank": 26,
+      "date": "2026-11-19",
+      "close": 125200.0,
+      "change_1d_pct": 1.54,
+      "change_20d_pct": -4.21,
+      "ma20": 126310.0,
+      "ma60": 127403.3,
+      "rsi14": 48.9,
+      "volume_ratio": 0.62,
+      "high_52w": 149800.0,
+      "from_52w_high_pct": -16.42,
+      "rs_raw": 19.85,
+      "rs_rating": 78,
+      "rs_20d": 2.95,
+      "trend_template": "6/7"
+    },
+    "005490": {
+      "name": "POSCO홀딩스",
+      "source": "시총상위",
+      "mcap_rank": 27,
+      "date": "2026-11-19",
+      "close": 261500.0,
+      "change_1d_pct": -1.32,
+      "change_20d_pct": -8.57,
+      "ma20": 271600.0,
+      "ma60": 303458.3,
+      "rsi14": 40.0,
+      "volume_ratio": 0.94,
+      "high_52w": 542000.0,
+      "from_52w_high_pct": -51.75,
+      "rs_raw": -13.71,
+      "rs_rating": 34,
+      "rs_20d": -1.41,
+      "trend_template": "0/7"
+    },
+    "033780": {
+      "name": "KT&G",
+      "source": "시총상위",
+      "mcap_rank": 28,
+      "date": "2026-11-19",
+      "close": 182500.0,
+      "change_1d_pct": 0.33,
+      "change_20d_pct": -5.73,
+      "ma20": 186165.0,
+      "ma60": 180231.7,
+      "rsi14": 48.1,
+      "volume_ratio": 0.8,
+      "high_52w": 201000.0,
+      "from_52w_high_pct": -9.2,
+      "rs_raw": 21.16,
+      "rs_rating": 84,
+      "rs_20d": 1.42,
+      "trend_template": "7/7"
+    },
+    "010120": {
+      "name": "LS ELECTRIC",
+      "source": "시총상위",
+      "mcap_rank": 29,
+      "date": "2026-11-19",
+      "close": 121100.0,
+      "change_1d_pct": 3.24,
+      "change_20d_pct": -24.36,
+      "ma20": 136245.0,
+      "ma60": 175818.3,
+      "rsi14": 38.4,
+      "volume_ratio": 0.6,
+      "high_52w": 335000.0,
+      "from_52w_high_pct": -63.85,
+      "rs_raw": -10.22,
+      "rs_rating": 39,
+      "rs_20d": -17.21,
+      "trend_template": "1/7"
+    },
+    "017670": {
+      "name": "SK텔레콤",
+      "source": "시총상위",
+      "mcap_rank": 30,
+      "date": "2026-11-19",
+      "close": 82200.0,
+      "change_1d_pct": -1.32,
+      "change_20d_pct": 9.02,
+      "ma20": 78725.0,
+      "ma60": 84968.3,
+      "rsi14": 52.9,
+      "volume_ratio": 1.59,
+      "high_52w": 139500.0,
+      "from_52w_high_pct": -41.08,
+      "rs_raw": 13.34,
+      "rs_rating": 70,
+      "rs_20d": 16.17,
+      "trend_template": "2/7"
+    },
+    "298040": {
+      "name": "효성중공업",
+      "source": "시총상위",
+      "mcap_rank": 31,
+      "date": "2026-11-19",
+      "close": 1785000.0,
+      "change_1d_pct": 5.25,
+      "change_20d_pct": -6.59,
+      "ma20": 1817700.0,
+      "ma60": 2369933.3,
+      "rsi14": 44.4,
+      "volume_ratio": 0.65,
+      "high_52w": 4742000.0,
+      "from_52w_high_pct": -62.36,
+      "rs_raw": -24.34,
+      "rs_rating": 22,
+      "rs_20d": 0.56,
+      "trend_template": "0/7"
+    },
+    "096770": {
+      "name": "SK이노베이션",
+      "source": "시총상위",
+      "mcap_rank": 32,
+      "date": "2026-11-19",
+      "close": 99300.0,
+      "change_1d_pct": -4.89,
+      "change_20d_pct": -29.57,
+      "ma20": 118515.0,
+      "ma60": 134686.7,
+      "rsi14": 31.0,
+      "volume_ratio": 1.27,
+      "high_52w": 165400.0,
+      "from_52w_high_pct": -39.96,
+      "rs_raw": -7.49,
+      "rs_rating": 41,
+      "rs_20d": -22.42,
+      "trend_template": "1/7"
+    },
+    "018260": {
+      "name": "삼성에스디에스",
+      "source": "시총상위",
+      "mcap_rank": 33,
+      "date": "2026-11-19",
+      "close": 216000.0,
+      "change_1d_pct": -6.7,
+      "change_20d_pct": 3.35,
+      "ma20": 217625.0,
+      "ma60": 218575.0,
+      "rsi14": 48.8,
+      "volume_ratio": 2.05,
+      "high_52w": 388500.0,
+      "from_52w_high_pct": -44.4,
+      "rs_raw": 22.99,
+      "rs_rating": 86,
+      "rs_20d": 10.5,
+      "trend_template": "3/7"
+    },
+    "010130": {
+      "name": "고려아연",
+      "source": "시총상위",
+      "mcap_rank": 34,
+      "date": "2026-11-19",
+      "close": 799000.0,
+      "change_1d_pct": -0.62,
+      "change_20d_pct": -10.22,
+      "ma20": 884650.0,
+      "ma60": 1051650.0,
+      "rsi14": 32.0,
+      "volume_ratio": 1.03,
+      "high_52w": 2188000.0,
+      "from_52w_high_pct": -63.48,
+      "rs_raw": -26.63,
+      "rs_rating": 16,
+      "rs_20d": -3.07,
+      "trend_template": "0/7"
+    },
+    "042700": {
+      "name": "한미반도체",
+      "source": "시총상위",
+      "mcap_rank": 35,
+      "date": "2026-11-19",
+      "close": 171900.0,
+      "change_1d_pct": 1.24,
+      "change_20d_pct": -10.09,
+      "ma20": 179755.0,
+      "ma60": 214050.0,
+      "rsi14": 42.9,
+      "volume_ratio": 0.95,
+      "high_52w": 426000.0,
+      "from_52w_high_pct": -59.65,
+      "rs_raw": -5.26,
+      "rs_rating": 43,
+      "rs_20d": -2.94,
+      "trend_template": "1/7"
+    },
+    "009540": {
+      "name": "HD한국조선해양",
+      "source": "시총상위",
+      "mcap_rank": 36,
+      "date": "2026-11-19",
+      "close": 231500.0,
+      "change_1d_pct": 0.22,
+      "change_20d_pct": -6.46,
+      "ma20": 241150.0,
+      "ma60": 296200.0,
+      "rsi14": 35.1,
+      "volume_ratio": 0.54,
+      "high_52w": 488000.0,
+      "from_52w_high_pct": -52.56,
+      "rs_raw": -30.14,
+      "rs_rating": 13,
+      "rs_20d": 0.69,
+      "trend_template": "0/7"
+    },
+    "015760": {
+      "name": "한국전력",
+      "source": "시총상위",
+      "mcap_rank": 37,
+      "date": "2026-11-19",
+      "close": 25350.0,
+      "change_1d_pct": 0.4,
+      "change_20d_pct": -11.05,
+      "ma20": 28537.5,
+      "ma60": 30160.8,
+      "rsi14": 32.5,
+      "volume_ratio": 0.71,
+      "high_52w": 69500.0,
+      "from_52w_high_pct": -63.53,
+      "rs_raw": -25.23,
+      "rs_rating": 20,
+      "rs_20d": -3.9,
+      "trend_template": "0/7"
+    },
+    "024110": {
+      "name": "기업은행",
+      "source": "시총상위",
+      "mcap_rank": 38,
+      "date": "2026-11-19",
+      "close": 19170.0,
+      "change_1d_pct": 0.05,
+      "change_20d_pct": -3.13,
+      "ma20": 19134.0,
+      "ma60": 19944.7,
+      "rsi14": 44.8,
+      "volume_ratio": 0.75,
+      "high_52w": 29550.0,
+      "from_52w_high_pct": -35.13,
+      "rs_raw": 2.6,
+      "rs_rating": 57,
+      "rs_20d": 4.02,
+      "trend_template": "0/7"
+    },
+    "086280": {
+      "name": "현대글로비스",
+      "source": "시총상위",
+      "mcap_rank": 39,
+      "date": "2026-11-19",
+      "close": 203500.0,
+      "change_1d_pct": 0.74,
+      "change_20d_pct": 14.33,
+      "ma20": 194610.0,
+      "ma60": 196608.3,
+      "rsi14": 57.4,
+      "volume_ratio": 0.43,
+      "high_52w": 296000.0,
+      "from_52w_high_pct": -31.25,
+      "rs_raw": 9.44,
+      "rs_rating": 62,
+      "rs_20d": 21.48,
+      "trend_template": "3/7"
+    },
+    "267260": {
+      "name": "HD현대일렉트릭",
+      "source": "시총상위",
+      "mcap_rank": 40,
+      "date": "2026-11-19",
+      "close": 417000.0,
+      "change_1d_pct": 7.47,
+      "change_20d_pct": -13.66,
+      "ma20": 419200.0,
+      "ma60": 588691.7,
+      "rsi14": 42.6,
+      "volume_ratio": 0.68,
+      "high_52w": 1430000.0,
+      "from_52w_high_pct": -70.84,
+      "rs_raw": -41.56,
+      "rs_rating": 3,
+      "rs_20d": -6.51,
+      "trend_template": "0/7"
+    },
+    "051910": {
+      "name": "LG화학",
+      "source": "시총상위",
+      "mcap_rank": 41,
+      "date": "2026-11-19",
+      "close": 210000.0,
+      "change_1d_pct": -0.24,
+      "change_20d_pct": -11.95,
+      "ma20": 231625.0,
+      "ma60": 255250.0,
+      "rsi14": 36.8,
+      "volume_ratio": 0.72,
+      "high_52w": 437500.0,
+      "from_52w_high_pct": -52.0,
+      "rs_raw": -22.21,
+      "rs_rating": 28,
+      "rs_20d": -4.8,
+      "trend_template": "0/7"
+    },
+    "003670": {
+      "name": "포스코퓨처엠",
+      "source": "시총상위",
+      "mcap_rank": 42,
+      "date": "2026-11-19",
+      "close": 166400.0,
+      "change_1d_pct": -0.54,
+      "change_20d_pct": -0.6,
+      "ma20": 166680.0,
+      "ma60": 177390.0,
+      "rsi14": 47.7,
+      "volume_ratio": 0.59,
+      "high_52w": 299500.0,
+      "from_52w_high_pct": -44.44,
+      "rs_raw": -2.55,
+      "rs_rating": 47,
+      "rs_20d": 6.56,
+      "trend_template": "2/7"
+    },
+    "180640": {
+      "name": "한진칼",
+      "source": "시총상위",
+      "mcap_rank": 43,
+      "date": "2026-11-19",
+      "close": 216500.0,
+      "change_1d_pct": -2.7,
+      "change_20d_pct": 81.32,
+      "ma20": 176730.0,
+      "ma60": 147556.7,
+      "rsi14": 65.9,
+      "volume_ratio": 0.4,
+      "high_52w": 245000.0,
+      "from_52w_high_pct": -11.63,
+      "rs_raw": 99.87,
+      "rs_rating": 99,
+      "rs_20d": 88.48,
+      "trend_template": "7/7"
+    },
+    "010140": {
+      "name": "삼성중공업",
+      "source": "시총상위",
+      "mcap_rank": 44,
+      "date": "2026-11-19",
+      "close": 16090.0,
+      "change_1d_pct": 1.64,
+      "change_20d_pct": -6.56,
+      "ma20": 16430.5,
+      "ma60": 18855.7,
+      "rsi14": 41.9,
+      "volume_ratio": 0.52,
+      "high_52w": 35350.0,
+      "from_52w_high_pct": -54.48,
+      "rs_raw": -24.0,
+      "rs_rating": 24,
+      "rs_20d": 0.59,
+      "trend_template": "0/7"
+    },
+    "035720": {
+      "name": "카카오",
+      "source": "시총상위",
+      "mcap_rank": 45,
+      "date": "2026-11-19",
+      "close": 31900.0,
+      "change_1d_pct": -0.31,
+      "change_20d_pct": 5.63,
+      "ma20": 30867.5,
+      "ma60": 32922.5,
+      "rsi14": 52.2,
+      "volume_ratio": 0.76,
+      "high_52w": 64800.0,
+      "from_52w_high_pct": -50.77,
+      "rs_raw": -19.9,
+      "rs_rating": 30,
+      "rs_20d": 12.78,
+      "trend_template": "0/7"
+    },
+    "042660": {
+      "name": "한화오션",
+      "source": "시총상위",
+      "mcap_rank": 46,
+      "date": "2026-11-19",
+      "close": 45100.0,
+      "change_1d_pct": 0.11,
+      "change_20d_pct": -20.46,
+      "ma20": 49645.0,
+      "ma60": 69008.3,
+      "rsi14": 31.2,
+      "volume_ratio": 0.69,
+      "high_52w": 154800.0,
+      "from_52w_high_pct": -70.87,
+      "rs_raw": -47.65,
+      "rs_rating": 1,
+      "rs_20d": -13.3,
+      "trend_template": "0/7"
+    },
+    "003550": {
+      "name": "LG",
+      "source": "시총상위",
+      "mcap_rank": 47,
+      "date": "2026-11-19",
+      "close": 90600.0,
+      "change_1d_pct": 0.67,
+      "change_20d_pct": -9.22,
+      "ma20": 93330.0,
+      "ma60": 105926.7,
+      "rsi14": 39.1,
+      "volume_ratio": 0.51,
+      "high_52w": 185900.0,
+      "from_52w_high_pct": -51.26,
+      "rs_raw": -0.63,
+      "rs_rating": 53,
+      "rs_20d": -2.06,
+      "trend_template": "0/7"
+    },
+    "028050": {
+      "name": "삼성E&A",
+      "source": "시총상위",
+      "mcap_rank": 48,
+      "date": "2026-11-19",
+      "close": 63400.0,
+      "change_1d_pct": -0.94,
+      "change_20d_pct": 13.01,
+      "ma20": 63875.0,
+      "ma60": 53343.3,
+      "rsi14": 55.1,
+      "volume_ratio": 0.46,
+      "high_52w": 70300.0,
+      "from_52w_high_pct": -9.82,
+      "rs_raw": 76.69,
+      "rs_rating": 95,
+      "rs_20d": 20.17,
+      "trend_template": "7/7"
+    },
+    "196170": {
+      "name": "알테오젠",
+      "source": "시총상위",
+      "mcap_rank": 49,
+      "date": "2026-11-19",
+      "close": 173300.0,
+      "change_1d_pct": 0.87,
+      "change_20d_pct": -24.65,
+      "ma20": 196470.0,
+      "ma60": 241706.7,
+      "rsi14": 34.2,
+      "volume_ratio": 0.75,
+      "high_52w": 437818.0,
+      "from_52w_high_pct": -60.42,
+      "rs_raw": -33.34,
+      "rs_rating": 9,
+      "rs_20d": -17.5,
+      "trend_template": "0/7"
+    },
+    "003490": {
+      "name": "대한항공",
+      "source": "시총상위",
+      "mcap_rank": 50,
+      "date": "2026-11-19",
+      "close": 32650.0,
+      "change_1d_pct": 3.49,
+      "change_20d_pct": 23.44,
+      "ma20": 29372.5,
+      "ma60": 29348.3,
+      "rsi14": 65.1,
+      "volume_ratio": 1.1,
+      "high_52w": 32950.0,
+      "from_52w_high_pct": -0.91,
+      "rs_raw": 44.85,
+      "rs_rating": 93,
+      "rs_20d": 30.59,
+      "trend_template": "7/7"
+    }
+  },
+  "failures": {}
+}
